@@ -1,0 +1,56 @@
+/* table, th, td {
+    border: 1px solid;
+    
+  }
+table{
+    margin-left: 17%;
+}*/
+.mkScroll{
+    height: auto;
+    max-width: 95%;
+    max-height: 500px;
+    overflow: auto;
+}
+.styled-table table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+  font-family: Verdana, Arial, sans-serif;
+}
+
+.styled-table th,
+.styled-table td {
+  border: 1px solid #000;
+  padding: 4px 6px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.amount { text-align: right; }
+.center { text-align: center; }
+.right  { text-align: right; }
+
+.subtotal td {
+  background: #f2f2f2;
+  font-weight: bold;
+}
+
+.grand-total td {
+  background: #d9edf7;
+  font-weight: bold;
+}
+
+input[type="text"] {
+  padding: 5px;
+  margin-bottom: 10px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+@media print {
+  .styled-table th,
+  .styled-table td {
+    border: 1px solid #000 !important;
+  }
+}

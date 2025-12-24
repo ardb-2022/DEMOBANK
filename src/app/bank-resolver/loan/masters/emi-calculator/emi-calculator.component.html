@@ -1,0 +1,94 @@
+<loading *ngIf="isLoading"></loading>
+<div class="emi-calculator-container">
+  <!-- Left Form -->
+  <div class="calculator">
+    <mat-card>
+      <mat-card-title>EMI Calculator</mat-card-title><br>
+      <mat-card-content>
+        <form [formGroup]="emiForm" (ngSubmit)="calculateEMI()">
+          <mat-form-field appearance="outline">
+            <mat-label>Loan Amount</mat-label>
+            <input matInput type="number" formControlName="ad_prn_amt" placeholder="Enter Amount">
+          </mat-form-field><br>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Interest Rate (%)</mat-label>
+            <input matInput type="number" step="0.01" formControlName="ad_intt_rt" placeholder="Enter Interest Rate">
+          </mat-form-field> <br>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tenure (Months)</mat-label>
+            <input matInput type="number" formControlName="ad_instl_amt" placeholder="Enter Months">
+          </mat-form-field><br>
+
+          <mat-form-field appearance="outline">
+            <mat-label>EMI Formula</mat-label>
+            <mat-select formControlName="emi_formula">
+              <mat-option [value]="1">EMI</mat-option>
+              <mat-option [value]="2">Reducing</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" type="submit" class="full-width" >
+            Calculate
+          </button><br>
+          <button mat-raised-button type="button" color="primary"  class="full-width" [useExistingCss]="true"
+          printSectionId="hiddenTab" ngxPrint>Print</button><hr>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Right Table -->
+  <div class="view">
+    <mat-card *ngIf="emiData.length">
+      <mat-card-title>EMI Schedule</mat-card-title>
+       
+      <div class="styled-table" id="hiddenTab" >
+        <table >
+         
+          <thead>
+             <tr>
+              <td colspan="4">
+               <div class="justify-content-center" style="text-align:center" colspan="4">
+                <h4>{{ardbName}} ({{branchName}})</h4>
+            
+                <h4>Principal Amount : {{this.f.ad_prn_amt.value}} , Intt Rt. :{{this.f.ad_intt_rt.value}}%</h4>
+                <h4>Tenure : {{this.f.ad_instl_amt.value}} (Months), Schedule Type: {{this.f.emi_formula.value==1?'EMI':'Reducing'}} </h4> <br>
+               
+            
+              </div>
+              </td>
+             </tr>
+            <tr>
+               
+              <th class="center">EMI No</th>
+              <th class="amount">Principal</th>
+              <th class="amount">Interest</th>
+              <th class="amount">Total EMI </th>
+            </tr>
+          </thead>
+           <tbody>
+            <tr *ngFor="let row of emiData">
+              <td class="center">{{ row.emi_no }}</td>
+              <td class="amount">{{ row.emi_prn | number: '1.2-2' }}</td>
+              <td class="amount">{{ row.emi_intt | number: '1.2-2' }}</td>
+              <td class="amount">{{ row.total_emi | number: '1.2-2' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="center"><b>Total</b></td>
+              <td class="amount"><b>{{totalPrn | number:'1.2-2'}}</b></td>
+              <td class="amount"><b>{{totalIntt | number:'1.2-2'}}</b></td>
+              <td class="amount"><b>{{totalEMI | number:'1.2-2'}}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+         
+      </div>
+    </mat-card>
+  </div>
+</div>
+ 
+

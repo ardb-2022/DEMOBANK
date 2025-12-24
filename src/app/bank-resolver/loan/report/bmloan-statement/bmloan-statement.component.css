@@ -1,0 +1,34 @@
+.loan-statement-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+.loan-statement-table th, .loan-statement-table td {
+  border: 1px solid #000;
+  padding: 4px 6px;
+}
+.center { text-align: center; }
+.right { text-align: right; }
+.amount { text-align: right; }
+.loan-statement-table thead tr:first-child th {
+  border: none;
+}
+tfoot th {
+  background: #f1f1f1;
+  font-weight: bold;
+}
+
+
+.mkScroll{
+    height: auto;
+    max-width: 95%;
+    max-height: 500px;
+    overflow: auto;
+}
+
+ 
+
+@page footer{
+ margin-top:100cm !important; 
+ flex: 0 0 50px !important;
+} 

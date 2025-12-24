@@ -1,0 +1,217 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button  type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form [formGroup]="reportcriteria">
+
+         <div class="form-row">
+           <div class="col-12">
+           <div class="form-group " style="margin-bottom: 0%;">
+          <small for="agent_cd">Search Agent.. </small>
+          <input type="text" class="form-control form-control-sm"
+          formControlName="agent_cd"   (keyup)="onshow($event)" placeholder="Search by agent name or code..">
+          
+        </div>
+        <ng-container>
+          <div class="suggestions border p-2 " style="width: 98%; top: 48%; left: 1%;"
+          *ngIf="showHideAgent">
+               
+            <table id="customers1">
+              <tr>
+                <th> Agent Code</th>
+                <th>Agent Name</th>
+              </tr>
+              <tbody *ngFor="let agent of allAgent" >
+                <tr  (click)="selectAgent(agent)">
+                  <td>
+                    {{agent.agent_cd}}
+                  </td>
+                  <td>
+                    {{agent.agent_name}}
+                  </td>
+                </tr>
+               
+              </tbody>
+              
+            </table>
+            </div>
+        </ng-container>
+        </div>
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button"  (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate"  bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="hiddenTab"  [printStyle]="{ '@page': { size: 'landscape !important' } }" ngxPrint>Print</button>
+         <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+        <div class="mb-2">
+          <label>
+            <input type="checkbox" [(ngModel)]="showMonthEnd" />
+          Monthend View
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll" id="hiddenTab">
+      
+      
+
+    <table class="styled-table">
+  <thead>
+    <!-- Report Title -->
+    <tr>
+      <th [attr.colspan]="showMonthEnd ? 17 : 15" style="text-align:center;">
+        <h3>{{ardbName}} </h3>
+        <h3>({{branchName}})</h3>
+        <h3>Run Date & Time : {{today}} </h3>
+        <h4>
+          <u>
+            Loan Collection from
+            {{ reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy' }}
+            to
+            {{ reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy' }}
+          </u>
+        </h4>
+          
+      </th>
+    </tr>
+
+    <!-- Customer Info Row -->
+    <tr>
+      <td [attr.colspan]="showMonthEnd ? 17 : 15" style="padding:10px;">
+        <div style="display: flex; justify-content: space-between;">
+          <!-- Left Info -->
+          <div>
+            <p><strong>Agent Name:</strong> {{selectedAgent }}</p>
+           
+            <!-- <p><strong>No of Instl Paid:</strong> {{ reportData[0]?.no_instl_paid }}</p> -->
+          </div>
+
+          <!-- Right Info -->
+          <div>
+            <!-- <p><strong>Cust Cd:</strong> {{ reportData[0]?.cust_cd }}</p>
+            <p><strong>Share Acc No:</strong> {{ reportData[0]?.share_acc_num }} <strong>SB Acc No:</strong> {{ reportData[0]?.sb_acc_no }}</p>
+            <p><strong>Loan Type:</strong> {{ reportData[0]?.acc_name }}</p>
+            <p><strong>Disbursed Amount:</strong> {{ reportData[0]?.disb_amt | number: '1.2-2' }}</p>
+            <p><strong>Ledger No:</strong> {{ reportData[0]?.ledger_no }}</p>
+            <p><strong>Overdue Outstanding:</strong> {{ reportData[0]?.ovd_prn | number: '1.2-2' }}</p>
+            <p><strong>DDS Account Number:</strong> {{ reportData[0]?.dds_acc_num }}</p>
+            <p><strong>NPA Status:</strong> {{ reportData[0]?.npa_status }}</p> -->
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- Table Headers -->
+    <tr>
+        <th class="center">SL No</th>
+        <th class="left">Customer Name</th>
+        <th class="left">Acc Type</th>
+        <th class="center">Acc Number</th>
+        <th class="center">DDS Acc Number</th>
+        <th class="amount">Disburs Amt</th>
+        <th class="center">Disburs Dt</th>
+        <th class="center" >Instl No</th>
+        <th class="amount" *ngIf="showMonthEnd">Bfr Monthend Recov</th>
+        <th class="amount" *ngIf="showMonthEnd">Monthend Recov</th>
+        <th class="amount">Total Recovery</th>
+        <th class="amount">Outstanding</th>
+        <th class="amount">Curr Principal</th>
+        <th class="amount">Ovd Principal</th>
+        <th class="amount">Ovd Interest</th>
+        <th class="center">NPA Status</th>
+        <th class="center">Phone</th>
+
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let item of reportData; let i = index">
+      <td class="center">{{ i + 1 }}</td>
+        <td>{{ item.cust_name }}</td>
+        <td>{{ getLoanTypeName(item.acc_type_cd) }}</td>
+        <td class="center">{{ item.acc_num }}</td>
+        <td class="center">{{ item.dds_acc_num }}</td>
+        <td class="amount">{{ item.disb_amt | number:'1.0-2' }}</td>
+        <td class="center">{{ item.disb_dt.substr(0,10) }}</td>
+        <td class="center" >{{ item.instl_no }}</td>
+        <td class="amount" *ngIf="showMonthEnd">{{ item.bfr_monthend_recov }}</td>
+        <td class="amount" *ngIf="showMonthEnd">{{ item.monthend_recov }}</td>
+        <td class="amount">{{ item.total_recov | number:'1.0-2' }}</td>
+        <td class="amount">{{ item.outstanding | number:'1.0-2' }}</td>
+        <td class="amount">{{ item.curr_prn | number:'1.0-2' }}</td>
+        <td class="amount">{{ item.ovd_prn | number:'1.0-2' }}</td>
+        <td class="amount">{{ item.ovd_intt | number:'1.0-2' }}</td>
+        <td class="status">{{ item.npa_status }}</td>
+        <td class="center">{{ item.phone || '-' }}</td>
+    </tr>
+  </tbody>
+  <tr class="total-row">
+    <td class="center" [attr.colspan]="showMonthEnd ? 11 : 9"><b>Total</b></td>
+    <td class="amount"><b>{{ totOutstanding | number: '1.2-2' }}</b></td>
+    <td class="amount"><b>{{ totCurrPrn | number: '1.2-2' }}</b></td>
+    <td class="amount"><b>{{ totOvdPrn | number: '1.2-2' }}</b></td>
+    <td class="amount"><b>{{ totOvdIntt | number: '1.2-2' }}</b></td>
+    <td class="amount"  colspan="2"></td>
+  </tr>
+    </table>
+        
+    </div>
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="hiddenTab"  [printStyle]="{ '@page': { size: 'landscape !important' } }" ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+      </div>
+    </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

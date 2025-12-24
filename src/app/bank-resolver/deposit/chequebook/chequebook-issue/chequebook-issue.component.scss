@@ -1,0 +1,761 @@
+/* Complete CSS for cheque-issue.component.scss */
+
+// Variables
+$primary-color: #3498db;
+$success-color: #27ae60;
+$warning-color: #f39c12;
+$danger-color: #e74c3c;
+$info-color: #17a2b8;
+$dark-color: #2c3e50;
+$light-color: #ecf0f1;
+$white: #ffffff;
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
+$border-radius: 12px;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// Mixins
+@mixin gradient-bg($color1, $color2) {
+  background: linear-gradient(135deg, $color1 0%, $color2 100%);
+}
+
+@mixin glassmorphism {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@mixin button-style($bg-color, $text-color: $white) {
+  @include gradient-bg($bg-color, darken($bg-color, 10%));
+  color: $text-color;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition;
+  position: relative;
+  overflow: hidden;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: $shadow-hover;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transition: $transition;
+    transform: translate(-50%, -50%);
+  }
+
+  &:hover:not(:disabled)::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  i, span {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// Main Container
+.cheque-issue-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2c8b8b 0%, #3d7979 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+// Header
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h1 {
+    color: $white;
+    font-size: 32px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin: 0;
+
+    i {
+      margin-right: 15px;
+      font-size: 36px;
+    }
+  }
+}
+
+// Main Content Layout
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr 700px;
+  gap: 30px;
+  margin-bottom: 30px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Form Section
+.form-section {
+  @include glassmorphism;
+  border-radius: $border-radius;
+  padding: 30px;
+  box-shadow: $shadow;
+
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid $light-color;
+
+    h2 {
+      color: $dark-color;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+
+      i {
+        margin-right: 10px;
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+// Mode Indicators
+.mode-indicator {
+  .badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    &.badge-new {
+      background: $success-color;
+      color: $white;
+      animation: pulse 2s infinite;
+    }
+
+    &.badge-modify {
+      background: $warning-color;
+      color: $white;
+      animation: pulse 2s infinite;
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+// Form Styling
+.cheque-form {
+  .form-group {
+    margin-bottom: 25px;
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: $dark-color;
+      font-size: 14px;
+
+      i {
+        margin-right: 8px;
+        color: $primary-color;
+        width: 16px;
+      }
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 3px 5px;
+      border: 2px solid #e1e8ed;
+      border-radius: $border-radius;
+      font-size: 14px;
+      background: #f8f9fa;
+      transition: $transition;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        background: $white;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+        transform: translateY(-1px);
+      }
+
+      &.error {
+        border-color: $danger-color;
+        background: rgba($danger-color, 0.05);
+      }
+
+      &:disabled {
+        background: #e9ecef;
+        color: #6c757d;
+        cursor: not-allowed;
+      }
+    }
+
+    .error-message {
+      margin-top: 8px;
+      color: $danger-color;
+      font-size: 12px;
+      font-weight: 500;
+
+      i {
+        margin-right: 5px;
+      }
+    }
+
+    .field-note {
+      display: block;
+      margin-top: 5px;
+      font-size: 11px;
+      color: #6c757d;
+      font-style: italic;
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// Status Field Special Styling
+.status-field {
+  position: relative;
+}
+
+.status-indicator {
+  // position: absolute;
+  // right: 34%;
+  // top: 41%;
+  transform: translateY(-50%);
+  // width: 12px;
+  height: 12px;
+  // border-radius: 50%;
+  transition: $transition;
+
+  &.status-pending {
+    background: $warning-color;
+    box-shadow: 0 0 10px rgba($warning-color, 0.5);
+  }
+
+  &.status-approved {
+    background: $success-color;
+    box-shadow: 0 0 10px rgba($success-color, 0.5);
+  }
+
+  &.status-rejected {
+    background: $danger-color;
+    box-shadow: 0 0 10px rgba($danger-color, 0.5);
+  }
+}
+
+// Audit Panel
+.audit-panel {
+  margin-top: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: $border-radius;
+  border-left: 4px solid $info-color;
+
+  h4 {
+    margin: 0 0 15px 0;
+    color: $dark-color;
+    font-size: 16px;
+    font-weight: 600;
+
+    i {
+      margin-right: 8px;
+      color: $info-color;
+    }
+  }
+
+  .audit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+
+    .audit-item {
+      display: flex;
+      flex-direction: column;
+      
+      label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+      }
+
+      span {
+        font-size: 14px;
+        color: $dark-color;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Accounts Section
+.accounts-section {
+  margin-top: 40px;
+
+  .section-header {
+    margin-bottom: 20px;
+
+    h3 {
+      color: $dark-color;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+
+      i {
+        margin-right: 10px;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .accounts-table {
+    background: $white;
+    border-radius: $border-radius;
+    overflow: hidden;
+    box-shadow: $shadow;
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr 0.8fr 0.8fr 1.5fr;
+      background: $dark-color;
+      color: $white;
+      padding: 15px;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+
+    .table-body {
+      // max-height: 200px;
+      // overflow-y: auto;
+
+      .account-row {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr 1fr 0.8fr 0.8fr 1.5fr;
+        padding: 15px;
+        border-bottom: 1px solid $light-color;
+        cursor: pointer;
+        transition: $transition;
+        font-size: 13px;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+          text-align: center;
+          gap: 5px;
+        }
+
+        &:hover {
+          background: linear-gradient(90deg, rgba($primary-color, 0.05), rgba($primary-color, 0.1));
+          transform: translateX(5px);
+        }
+
+        &.selected {
+          background: linear-gradient(90deg, rgba($primary-color, 0.1), rgba($primary-color, 0.2));
+          border-left: 4px solid $primary-color;
+          font-weight: 600;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+// Cheque Details Section
+.cheque-details-section {
+  @include glassmorphism;
+  border-radius: $border-radius;
+  padding: 30px;
+  box-shadow: $shadow;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid $light-color;
+
+    h3 {
+      color: $dark-color;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+
+      i {
+        margin-right: 10px;
+        color: $primary-color;
+      }
+
+      .cheque-count {
+        font-size: 14px;
+        color: #6c757d;
+        font-weight: 400;
+      }
+    }
+
+    .cheque-summary {
+      display: flex;
+      gap: 15px;
+
+      .summary-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+
+        i {
+          margin-right: 5px;
+        }
+
+        &.fresh {
+          background: rgba($success-color, 0.1);
+          color: $success-color;
+        }
+
+        &.used {
+          background: rgba($danger-color, 0.1);
+          color: $danger-color;
+        }
+      }
+    }
+  }
+
+  .cheque-grid-container {
+    .cheque-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 15px;
+      max-height: 700px;
+      overflow-y: auto;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: $border-radius;
+
+      .cheque-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        background: $white;
+        border-radius: $border-radius;
+        border-left: 4px solid transparent;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: $transition;
+
+        &.clickable {
+          cursor: pointer;
+        }
+
+        &.cheque-I {
+          border-left-color: $success-color;
+
+          &:hover {
+            background: rgba($success-color, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba($success-color, 0.2);
+          }
+        }
+
+        &.cheque-U {
+          border-left-color: $danger-color;
+
+          &:hover {
+            background: rgba($danger-color, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba($danger-color, 0.2);
+          }
+        }
+
+        .cheque-number {
+          font-size: 16px;
+          font-weight: 700;
+          color: $dark-color;
+          margin-bottom: 8px;
+        }
+
+        .cheque-status {
+          .status-badge {
+            display: flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+
+            i {
+              margin-right: 4px;
+            }
+
+            &.status-fresh {
+              background: rgba($success-color, 0.15);
+              color: $success-color;
+            }
+
+            &.status-used {
+              background: rgba($danger-color, 0.15);
+              color: $danger-color;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .no-cheques {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+
+    i {
+      font-size: 64px;
+      margin-bottom: 20px;
+      color: #dee2e6;
+    }
+
+    p {
+      margin: 10px 0;
+      font-size: 16px;
+
+      &.sub-text {
+        font-size: 14px;
+        color: #adb5bd;
+      }
+    }
+  }
+}
+
+// Action Buttons
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 25px;
+  background: rgb(255, 255, 255);
+  border-radius: $border-radius;
+  backdrop-filter: blur(10px);
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+    justify-content: center;
+
+    &.btn-new {
+      @include button-style($success-color);
+    }
+
+    &.btn-retrieve {
+      @include button-style($info-color);
+    }
+
+    &.btn-modify {
+      @include button-style($warning-color);
+    }
+
+    &.btn-save {
+      @include button-style($primary-color);
+
+      &.loading {
+        &::after {
+          content: '';
+          width: 16px;
+          height: 16px;
+          border: 2px solid transparent;
+          border-top: 2px solid currentColor;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-left: 8px;
+        }
+      }
+    }
+
+    &.btn-approve {
+      @include button-style(#1abc9c);
+    }
+
+    &.btn-back {
+      @include button-style(#95a5a6);
+    }
+
+    &.btn-delete {
+      @include button-style($danger-color);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .btn {
+      min-width: 100px;
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Loading Overlay
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+
+  .loading-spinner {
+    background: $white;
+    padding: 40px;
+    border-radius: $border-radius;
+    text-align: center;
+    box-shadow: $shadow-hover;
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid $primary-color;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    p {
+      margin: 0;
+      color: $dark-color;
+      font-weight: 600;
+    }
+  }
+}
+
+// Utility Classes
+.text-success { color: $success-color !important; }
+.text-warning { color: $warning-color !important; }
+.text-danger { color: $danger-color !important; }
+.text-info { color: $info-color !important; }
+.text-muted { color: #6c757d !important; }
+
+// Custom Scrollbar
+.cheque-grid::-webkit-scrollbar,
+.table-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cheque-grid::-webkit-scrollbar-track,
+.table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.cheque-grid::-webkit-scrollbar-thumb,
+.table-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+
+  &:hover {
+    background: #a8a8a8;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .cheque-issue-container {
+    padding: 10px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .form-section, .cheque-details-section {
+    padding: 20px;
+  }
+
+  .cheque-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .action-buttons {
+    .btn {
+      min-width: 80px;
+      padding: 8px 12px;
+      font-size: 12px;
+
+      span {
+        display: none;
+      }
+
+      i {
+        margin: 0;
+      }
+    }
+  }
+
+  .cheque-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+  }
+}

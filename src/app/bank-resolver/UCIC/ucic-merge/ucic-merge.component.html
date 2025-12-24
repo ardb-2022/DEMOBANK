@@ -1,0 +1,117 @@
+ <div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="ConfrmModal(Conformation)">Marged</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onReset()">Reset List</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-10 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Account Details</h4>
+            <div class="row  align-items-center  text-align: center;">
+                <div class="form-group col-4">
+                    <small for="cust_name" >Enter Account Holder Name</small>
+                    <input type="text" class="form-control form-control-sm mkUpper"  autocomplete="chrome-off" [(ngModel)]="custNAME"
+                    id="cust_name" placeholder="Full Name" >
+                </div>
+                <div class="form-group col-2">
+                    <button mat-raised-button type="button" style="margin-top: 10%;" class="btn btn-primary btn-sm ml-1 mr-1" (click)="getAllCustomer()">Search Customer</button>
+                </div>
+            <!-- <div class="form-group col-4">
+              <small for="date_of_payment">As on Date</small>
+                <div class="input-group">
+                <input type="text" placeholder="dd/mm/yyyy" class="form-control" 
+                [(ngModel)]="asOnDate"  bsDatepicker
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenFromDp">
+                <div class="input-group-append">
+                  <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </div> -->
+            </div>
+            <div class="table-responsive" class="scroll-when-long">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Type</th>
+                    <th scope="col">Cust CD</th>
+                    <th scope="col">Acc Type</th>
+                    <th scope="col">Acc Num</th>
+                    <th scope="col">Opening Dt</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                    <th scope="col" style="text-align: center;">Acc Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- <tr>
+                    <td></td>
+                    <td></td>
+                    <td> 
+                        <div class="custom-control form-control-sm custom-switch"><label class="btn btn-filter">
+                      <input type="checkbox" name="allTrades"  (change)="allTrades($event)">
+                    </label> </div> </td>
+                  </tr> -->
+                  <tr *ngFor="let cust of suggestedCustomer; let i=index" >
+                    <td>{{cust.type}}</td>
+                    <td>{{cust.custCd}}</td>
+                    <td>{{cust.accTypeDesc}}</td>
+                    <td>{{cust.accNum}}</td>
+                    <td>{{cust.openingDt.substr(0,10)}}</td>
+                    <td>{{cust.custName}}</td>
+                    <td>{{cust.guardianName}}</td>
+                    <td>{{cust.presentAddress}}</td>
+                    <td>
+                       <span [ngClass]="cust.accStatus == 'C' ? 'badge red' : 'badge green'">
+                        {{ cust.accStatus == 'C' ? 'CLOSE' : 'OPEN' }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <hr>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+        </div>
+  </div>
+  <div *ngIf="showMsg && showMsg.Show" class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="alert alert-dismissible fade show" role="alert" [ngClass]="{'alert-success': showMsg.Type === 0,
+     'alert-warning':showMsg.Type === 1, 'alert-info':showMsg.Type === 2, 'alert-danger':showMsg.Type === 3 }">
+      <strong>{{showMsg.Message}}</strong>
+      <button type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="ConfrmModal(Conformation)">Marged</button> -->
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onReset()">Reset List</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div>

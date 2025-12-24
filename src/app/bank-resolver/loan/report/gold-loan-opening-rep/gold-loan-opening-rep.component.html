@@ -1,0 +1,225 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button  type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form [formGroup]="reportcriteria">
+         <div class="form-row">
+          <div class="col-12">
+            <small for="acct_num">Search by Loan ID / Customer Name / Phone number
+            </small>
+  
+            <div class="input-group">
+              <input type="text" class="form-control form-control-sm " formControlName="acct_num" id="acct_num"
+                placeholder="Enter Loan ID / Customer Name / Phone number" (input)="cancelOnNull()" name="x-field-1"
+                autocomplete="new-field-1">
+  
+              <div class="input-group-append">
+                <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+  
+            <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+              <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                <thead>
+                  <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                    <td scope="row">{{cust.loan_id}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 98%; font-size: small;"
+              *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+              <strong class="text-danger">" {{this.reportcriteria.controls.acct_num.value}} " does not match with any
+                customer</strong>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="showWait">
+            Please wait...
+          </div>
+          
+          <!-- <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate"  bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div> -->
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="hiddenTab" ngxPrint>Print</button>
+         <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+         <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="lockDemandLetter()">Lock this Letter</button> -->
+         <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="provisionalHide=!provisionalHide">Show Hide Provisional Interest</button> -->
+
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll" id="hiddenTab">
+      
+    <div class="bond-container" *ngFor="let record of reportData">
+  <div class="header">
+    <!-- <h2>PURI URBAN &amp; RURAL DEVELOPMENT CO-OPERATIVE SOCIETY LTD.</h2> -->
+    <h2>DEMO CO-OPERATIVE SOCIETY LTD.</h2>
+    <p>{{selectedBranch?.brn_name}}, {{selectedBranch?.brn_addr}}</p>
+    <p>GOVT. REGD. NO. 192/54/XXXX</p>
+    <p>Email: ho@demoLtd.com | Contact: *****77397</p>
+  </div>
+
+  <div class="bond-title">
+    <p>Honorable Chief Executive Officer</p>
+    <h3>Bond No. {{record.loanCustomer.loan_acc_no}}</h3>
+  </div>
+    <p style="text-align: right;"><strong>Date :</strong> {{today | date:'dd/MM/yyyy'}}</p>
+
+  <p>Dear Sir,</p>
+  <p>Please Receive the Gold Ornaments deposited by me details of which are given below :-</p>
+
+  <table class="bond-table">
+    <thead>
+      <tr>
+        <th>Sl.No.</th>
+        <th>Description</th>
+        <th>Gross Wt (Grams)</th>
+        <th>Less</th>
+        <th>Net Wt (Grams)</th>
+        <th>Per unit Value (Rs)</th>
+        <th>Value (Rs)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of record.securityDetails">
+        <td>{{item.sl_no}}</td>
+        <td>{{item.gold_desc || '---'}}</td>
+        <td>{{item.gold_gross_wt | number:'1.3-3'}}</td>
+        <td>{{(item.gold_gross_wt - item.gold_net_wt) | number:'1.3-3'}}</td>
+        <td>{{item.gold_net_wt | number:'1.3-3'}}</td>
+        <td>{{item.unit_rate | number:'1.2-2'}}</td>
+        <td>{{item.gold_val | number:'1.2-2'}}</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2"><strong>Total :</strong></td>
+        <td>{{getTotalGrossWt(record.securityDetails) | number:'1.3-3'}}</td>
+        <td>{{getTotalLess(record.securityDetails) | number:'1.3-3'}}</td>
+        <td>{{getTotalNetWt(record.securityDetails) | number:'1.3-3'}}</td>
+        <td></td>
+        <td>{{getTotalValue(record.securityDetails) | number:'1.2-2'}}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p style="text-align: right;"><br>Signature of Goldsmith ____________________________</p>
+  <p>
+    I am the owner of the above noted ornaments and the Co-operative Society has no liability for any disputes in future.
+  </p>
+
+  <div class="footer">
+    <div>
+    <p><strong>Name:</strong> {{record.loanCustomer.cust_name}}, <strong>Occupation:</strong> {{record.loanCustomer.occupation}}</p>
+    <p><strong>Guardian:</strong> {{record.loanCustomer.guardian_name}}</p>
+    <p><strong>Address:</strong> {{record.loanCustomer.present_address}}</p>
+
+    </div>
+    <div>
+      <p style="text-align: right;"><strong>Loan Id:</strong> {{record.securityDetails[0]?.loan_id}} / <strong>UCIC:</strong> {{record.loanCustomer.party_cd}}</p>
+      <p style="text-align: right;"><strong>Disbursed Amount:</strong> {{record.loanCustomer.disb_amt | number:'1.2-2'}}</p>
+      <p style="text-align: right;"><strong>Disbursed Date:</strong> {{record.loanCustomer.disb_dt.substr(0,10)}}</p>
+    </div>
+  </div>
+
+  <div class="loan-info">
+      <p style="text-align: right;">_______________________________</p>
+      <p style="text-align: right;">(Full signature of the Loanee)</p>
+  </div>
+<div style="text-align: center; border-top: 2px solid black; padding: 5px;"> <strong >Keep Safely</strong></div>
+  <p>Received as details above</p>
+  <p>Custodian's Signature ____________________________</p>
+
+  <div class="footer">
+    <div>
+      <p style="text-align: center;font-size: 13px;font-weight: 700;">
+        Manager/Accountant<br>Demo Co-Op. Society Ltd.</p>
+    </div>
+    <div>
+      <p style="text-align: center;font-size: 13px;font-weight: 700;">
+        Manager/Accountant<br>Demo Co-Op. Society Ltd.</p>
+    </div>
+  </div>
+
+  <div class="working-hours">
+    <p><strong>Working Hours</strong></p>
+    <p>Monday To Friday  (Saturday: 1st, 3rd &amp; 5th if applicable)</p>
+    <p>2nd &amp; 4th Saturdays are closed</p>
+    <p>Time: 10.00 AM To 5.00 PM</p>
+    <p>Govt. &amp; Listed holidays are closed</p>
+  </div>
+    </div>
+
+
+
+        
+    </div>
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="hiddenTab" ngxPrint>Print</button>
+         <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+         <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="lockDemandLetter()">Lock this Letter</button> -->
+         <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="provisionalHide=!provisionalHide">Show Hide Provisional Interest</button> -->
+
+
+
+      </div>
+    </div>
+  </div>
+  <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+      <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+      <span class="alert-text">{{ showMsg.Message }}</span>
+    </div>
+  <loading *ngIf="isLoading"></loading>

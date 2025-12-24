@@ -1,0 +1,245 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button  type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button  type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form [formGroup]="reportcriteria">
+         <div class="form-row">
+          <div class="col-12">
+            <small for="acct_num">Search by Loan ID / Customer Name / Phone number
+            </small>
+  
+            <div class="input-group">
+              <input type="text" class="form-control form-control-sm " formControlName="acct_num" id="acct_num"
+                placeholder="Enter Loan ID / Customer Name / Phone number" (input)="cancelOnNull()" name="x-field-1"
+                autocomplete="new-field-1">
+  
+              <div class="input-group-append">
+                <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+  
+            <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+              <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                <thead>
+                  <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                    <td scope="row">{{cust.loan_id}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 98%; font-size: small;"
+              *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+              <strong class="text-danger">" {{this.reportcriteria.controls.acct_num.value}} " does not match with any
+                customer</strong>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="showWait">
+            Please wait...
+          </div>
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button"  (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate"  bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="hiddenTab" ngxPrint>Print</button>
+         <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+         <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="showHide()">Show Hide Principal & Interest</button>
+         <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="provisionalHide=!provisionalHide">Show Hide Provisional Interest</button>
+
+      </div>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll" id="hiddenTab">
+      
+      
+
+    <table class="styled-table">
+  <thead>
+    <!-- Report Title -->
+    <tr>
+      <th [attr.colspan]="prnInttHide?7:5" style="text-align:center;">
+        <h3>{{ardbName}} </h3>
+        <h3>({{branchName}})</h3>
+        <h3>Run Date & Time : {{today}} </h3>
+        <h4>
+          <u>
+            Member Loan Statement from
+            {{ reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy' }}
+            to
+            {{ reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy' }}
+          </u>
+        </h4>
+          
+      </th>
+    </tr>
+
+    <!-- Customer Info Row -->
+    <tr>
+      <td [attr.colspan]="prnInttHide?7:5" style="padding:10px;">
+        <div style="display: flex; justify-content: space-between;">
+          <!-- Left Info -->
+          <div>
+            <p><strong>Customer Name:</strong> {{ reportData[0]?.cust_name }}</p>
+            <p><strong>Address:</strong> {{ reportData[0]?.address }}</p>
+            <p><strong>Loan Type:</strong> {{ reportData[0]?.acc_name }}</p>
+            <p><strong>Loan ID:</strong> {{ reportData[0]?.loan_id }}</p>
+            <p><strong>Disbursement Date:</strong> {{ reportData[0]?.disb_dt.substr(0,10) }}</p>
+            <p><strong>Intt Rate:</strong> {{ reportData[0]?.curr_intt_rate }}%, <strong>Tenure:</strong> {{ reportData[0]?.tenure }}</p>
+            <p><strong>{{reportData[0]?.emi_formula_no==1?"EMI:":"Principal Instl Amount:"}}</strong> {{ reportData[0]?.instl_amt | number: '1.2-2' }}</p>
+            <p><strong>No of Instl Paid:</strong> {{ reportData[0]?.no_instl_paid }}</p>
+            <p><strong>NPA Status:</strong> {{ reportData[0]?.npa_status }}</p>
+          </div>
+
+          <!-- Right Info -->
+          <div>
+            <p><strong>Cust Cd:</strong> {{ reportData[0]?.cust_cd }}</p>
+            <p><strong>Share Acc No:</strong> {{ reportData[0]?.share_acc_num }} </p>
+            <p><strong>SB Acc No:</strong> {{ reportData[0]?.sb_acc_no }}</p>
+             <p><strong>Co-Applicant Name:</strong> {{ reportData[0]?.coapplicant }} </p>
+            <p><strong>Co-Applicant Share No:</strong> {{ reportData[0]?.coapplicant_share }}</p>
+            <p><strong>Disbursed Amount:</strong> {{ reportData[0]?.disb_amt | number: '1.2-2' }}</p>
+            <p><strong>Ledger No:</strong> {{ reportData[0]?.ledger_no }}</p>
+            <p><strong>Overdue Outstanding:</strong> {{ reportData[0]?.ovd_prn | number: '1.2-2' }}</p>
+            <p><strong>DDS Account Number:</strong> {{ reportData[0]?.dds_acc_num }}</p>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <!-- Table Headers -->
+    <tr>
+      <th class="center">Transaction Date</th>
+      <th class="left">Particulars</th>
+      <th class="amount">Debit Amount</th>
+      <th class="amount">Credit Amount</th>
+      <th *ngIf="prnInttHide" class="amount" style="color: blue;">Principal</th>
+      <th *ngIf="prnInttHide" class="amount" style="color: blue;">Interest</th>
+      <th class="amount" style="color: blue;">Balance</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let row of reportData" >
+      <td class="center">{{ row.trans_dt.substr(0,10) }}</td>
+      <td class="left">{{ getParticularsText(row.particulars, row.trans_cd) }}</td>
+      <td class="amount">{{ row.dr_amt | number: '1.2-2' }}</td>
+      <td class="amount">{{ row.cr_amt | number: '1.2-2' }}</td>
+      <td *ngIf="prnInttHide" class="amount" style="color: blue;">{{ row.principal | number: '1.2-2' }}</td>
+      <td *ngIf="prnInttHide" class="amount" style="color: blue;">{{ row.interest | number: '1.2-2' }}</td>
+      <td class="amount" style="color: blue; font-weight: 800;">{{ row.balance | number: '1.2-2' }}</td>
+    </tr>
+  </tbody>
+  <tr class="total-row">
+    <td class="center" colspan="2"><b>Total</b></td>
+    <td class="amount"><b>{{ totDisb | number: '1.2-2' }}</b></td>
+    <td class="amount"><b>{{ totbal | number: '1.2-2' }}</b></td>
+    <td *ngIf="prnInttHide" class="amount"></td>
+    <td *ngIf="prnInttHide" class="amount"></td>
+    <td class="amount"></td>
+  </tr>
+  <tr *ngIf="provisionalRow" class="provClass">
+  <td *ngIf="provisionalHide" class="center">{{ provisionalRow.trans_dt.substr(0,10) }}</td>
+  <td *ngIf="provisionalHide" class="left">{{ getParticularsText(provisionalRow.particulars, provisionalRow.trans_cd) }}</td>
+  <td *ngIf="provisionalHide" class="amount">{{ provisionalRow.dr_amt | number: '1.2-2' }}</td>
+  <td *ngIf="provisionalHide" class="amount">{{ provisionalRow.cr_amt | number: '1.2-2' }}</td>
+  <td *ngIf="prnInttHide && provisionalHide" class="amount"></td>
+  <td *ngIf="prnInttHide && provisionalHide" class="amount"></td>
+  <td *ngIf="provisionalHide" class="amount">{{ provisionalRow.balance | number: '1.2-2' }}</td>
+</tr>
+ <tr class="total-row">
+    <td *ngIf="provisionalHide"class="center"><b>Interest Calculated: {{totIntt| number: '1.2-2'}}</b></td>
+    <td *ngIf="provisionalHide"class="center" ><b>Total with Provision</b></td>
+    <td *ngIf="provisionalHide"class="amount"><b>{{totalSum | number: '1.2-2' }}</b></td>
+    <td *ngIf="provisionalHide"class="amount"></td>
+    <td *ngIf="prnInttHide && provisionalHide" class="amount"></td>
+    <td *ngIf="prnInttHide && provisionalHide"  class="amount"></td>
+    <td *ngIf="provisionalHide"class="amount"></td>
+  </tr>
+  <!-- <tfoot>
+    <tr>
+      <td class="center" colspan="2"><b>Total</b></td>
+      <td class="amount"><b>{{ totDisb | number: '1.2-2' }}</b></td>
+      <td class="amount"><b>{{ totbal | number: '1.2-2' }}</b></td>
+      <td class="amount"></td>
+
+    </tr>
+  </tfoot> -->
+    </table>
+        
+    </div>
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+          printSectionId="hiddenTab" ngxPrint>Print</button>
+         <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+         <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="showHide()">Show Hide Principal & Interest</button>
+         <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="provisionalHide=!provisionalHide">Show Hide Provisional Interest</button>
+
+
+
+      </div>
+    </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>

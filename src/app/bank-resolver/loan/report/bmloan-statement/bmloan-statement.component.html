@@ -1,0 +1,256 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+  
+        <div class="form-row">
+          <div class="col-12">
+            <small for="acct_num">Search by Loan ID / Customer Name / Phone number
+            </small>
+  
+            <div class="input-group">
+              <input type="text" class="form-control form-control-sm " formControlName="acct_num" id="acct_num"
+                placeholder="Enter Loan ID / Customer Name / Phone number" (input)="cancelOnNull()" name="x-field-1"
+                autocomplete="new-field-1">
+  
+              <div class="input-group-append">
+                <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+  
+            <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+              <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                <thead>
+                  <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                    <td scope="row">{{cust.loan_id}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 98%; font-size: small;"
+              *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+              <strong class="text-danger">" {{this.reportcriteria.controls.acct_num.value}} " does not match with any
+                customer</strong>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="showWait">
+            Please wait...
+          </div>
+          <div class="col-6">
+            <small for="fromDate">From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button"  (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate">To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate"  bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div style="text-align: center;">
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button"
+        [useExistingCss]="true" 
+        class="btn btn-rounded btn-primary m-1" 
+        
+          printSectionId="mattable" ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Exp to EXCEL</button>
+  
+      </div>
+    </div>
+   
+      <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+        <!-- <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+          <h4>{{ardbName}} {{branchName}}</h6>
+          <h6>Run Date & Time : {{today}} </h6> <br>
+          <h6> <u> Loan Statement from {{reportcriteria.controls.fromDate.value | date: 'dd/MM/yyyy'}} to
+              {{reportcriteria.controls.toDate.value | date: 'dd/MM/yyyy'}}</u></h6>
+          <p>
+            <b>
+              Name : {{custNm}} <br>
+              Loan ID : {{loanId}} <br>
+              Present Address : {{addr}}
+            </b>
+          </p>
+        </div> -->
+       
+  <div class="mat-elevation-z8" id="mattable">
+  <table class="loan-statement-table" *ngIf="reportData.length>0">
+  <thead>
+   
+    <tr>
+      <th colspan="17" class="center">
+        <h3>{{ardbName}}</h3>
+        <h3>{{branchName}}</h3>
+        <h4>RUN DATE: {{ today | date: 'dd/MM/yyyy' }}</h4>
+
+        <h4>
+          Loan Statement Between {{ reportcriteria.controls.fromDate.value | date: 'dd/MM/yyyy' }} To {{ reportcriteria.controls.toDate.value | date: 'dd/MM/yyyy' }}
+        </h4>
+      </th>
+    </tr>
+    <tr>
+      <th colspan="17" style="    background-color: aquamarine;">
+        Loan ID: {{ reportData[0]?.loan_id }} &nbsp;&nbsp;&nbsp;
+        Name: {{ reportData[0]?.cust_name }}
+      </th>
+    </tr>
+
+    <!-- First Header Row -->
+    <tr>
+      <th rowspan="2" class="center" style="background-color: rgb(171, 223, 129);">Tran Dt</th>
+      <th rowspan="2" style="background-color: rgb(129, 201, 223);"  class="center">Disburse Amount</th>
+      <th rowspan="2" style="background-color: rgb(198, 223, 129);" class="center">Capitalised Amount</th>
+      <th colspan="2" style="background-color: rgb(231, 176, 199);" class="center">Principal Recovery</th>
+      <th colspan="2" style="background-color: rgb(182, 176, 231);" class="center">Interest Recovery</th>
+      <th colspan="3" style="background-color: rgb(176, 231, 217);" class="center">Interest Calculated</th>
+      <th colspan="7" style="background-color: bisque;" class="center">Balance Outstanding</th>
+    </tr>
+
+    <!-- Second Header Row -->
+    <tr>
+      <th class="amount" style="background-color: rgb(231, 176, 199);" >Current</th>
+      <th class="amount" style="background-color: rgb(231, 176, 199);" >Overdue</th>
+      <th class="amount" style="background-color: rgb(182, 176, 231);">Current</th>
+      <th class="amount" style="background-color: rgb(182, 176, 231);">Overdue</th>
+      <th class="amount" style="background-color: rgb(176, 231, 217);">Current </th>
+      <th class="amount" style="background-color: rgb(176, 231, 217);">Overdue </th>
+      <th class="amount" style="background-color: rgb(176, 231, 217);">Total </th>
+      <th class="amount" style="background-color: bisque;">Current Prn</th>
+      <th class="amount" style="background-color: bisque;">Current Intt</th>
+      <th class="amount" style="background-color: bisque;">Overdue Prn</th>
+      <th class="amount" style="background-color: bisque;">Overdue Intt</th>
+      <th class="amount" style="background-color: bisque;">Balance Principal</th>
+      <th class="amount" style="background-color: bisque;">Balance Interest</th>
+      <th class="amount" style="background-color: bisque;">Balance Total</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let row of reportData">
+      <td style="background-color: rgb(171, 223, 129);">{{ row.trans_dt.substr(0,10)}}</td>
+      <td class="amount" style="background-color: rgb(129, 201, 223);">{{ row.disb_amt | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: rgb(198, 223, 129);">{{ row.capitalised_amt || 0 | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: rgb(231, 176, 199);">{{ row.curr_prn_recov | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: rgb(231, 176, 199);">{{ row.ovd_prn_recov | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: rgb(182, 176, 231);">{{ row.curr_intt_recov | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: rgb(182, 176, 231);">{{ row.ovd_intt_recov | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: rgb(176, 231, 217);">{{ row.curr_intt_calculated | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: rgb(176, 231, 217);">{{ row.ovd_intt_calculated | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: rgb(176, 231, 217);">{{ (row.curr_intt_calculated + row.ovd_intt_calculated) | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: bisque;">{{ row.curr_prn | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: bisque;">{{ row.curr_intt | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: bisque;">{{ row.ovd_prn | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: bisque;">{{ row.ovd_intt | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: bisque;">{{ (row.curr_prn + row.ovd_prn) | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: bisque;">{{ (row.curr_intt + row.ovd_intt) | number:'1.2-2' }}</td>
+      <td class="amount" style="background-color: bisque;">{{ (row.curr_prn + row.ovd_prn+row.curr_intt + row.ovd_intt) | number:'1.2-2' }}</td>
+    </tr>
+  </tbody>
+
+  <!-- Grand Total -->
+  <tfoot>
+    <tr>
+      <th colspan="3" class="right" style="background-color: rgb(198, 223, 129);">Grand Total</th>
+      <th class="amount" style="background-color: rgb(231, 176, 199);">{{ getTotal('curr_prn_recov') | number:'1.2-2' }}</th>
+      <th class="amount" style="background-color: rgb(231, 176, 199);">{{ getTotal('ovd_prn_recov') | number:'1.2-2' }}</th>
+      <th class="amount" style="background-color: rgb(182, 176, 231);">{{ getTotal('curr_intt_recov') | number:'1.2-2' }}</th>
+      <th class="amount" style="background-color: rgb(182, 176, 231);">{{ getTotal('ovd_intt_recov') | number:'1.2-2' }}</th>
+      <th class="amount" style="background-color: rgb(176, 231, 217);">{{ getTotal('curr_intt_calculated') | number:'1.2-2' }}</th>
+      <th class="amount" style="background-color: rgb(176, 231, 217);">{{ getTotal('ovd_intt_calculated') | number:'1.2-2' }}</th>
+      <th class="amount" style="background-color: rgb(176, 231, 217);">{{ getTotalCalcInterest() | number:'1.2-2' }}</th>
+      <th class="amount" style="background-color: bisque;" colspan="7"></th>
+      <!-- <th class="amount">{{ getTotal('curr_intt') | number:'1.2-2' }}</th>
+      <th class="amount">{{ getTotal('ovd_prn') | number:'1.2-2' }}</th>
+      <th class="amount">{{ getTotal('ovd_intt') | number:'1.2-2' }}</th>
+      <th class="amount">{{ getTotalBalancePrn() | number:'1.2-2' }}</th>
+      <th class="amount">{{ getTotalBalanceIntt() | number:'1.2-2' }}</th>
+      <th class="amount">{{ getTotalBalanceTotal() | number:'1.2-2' }}</th> -->
+    </tr>
+  </tfoot>
+</table>
+
+      <footer>
+        <small>
+          This report is generated through SynergicBanking
+         </small>
+       </footer>
+      </div>
+      
+      <!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[20,5,10,15,25,50,100,resultLength]" MatPaginator></mat-paginator> -->
+       
+      </div>
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div style="text-align: center;">
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button"
+        [useExistingCss]="true" 
+        class="btn btn-rounded btn-primary m-1" 
+        
+          printSectionId="mattable" ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Exp to EXCEL</button>
+  
+      </div>
+    </div>
+    </div>
+  
+  <loading *ngIf="isLoading"></loading>

@@ -1,0 +1,214 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <!-- <button mat-raised-button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button> -->
+  </div>
+  <div class="modal-body">
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error! </strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+
+      </button>
+     
+    </div>
+    <form [formGroup]="reportcriteria">
+      <div>
+        <small for="cust_name">Search Name/Cust code/Phone</small>
+        <div class="input-group">
+          <input type="text" class="form-control form-control-sm mkUpper"  autocomplete="chrome-off" formControlName="cust_name"
+          id="cust_name" (input)="onChangeName()">
+      <div class="input-group-append">
+      <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" style="font-size:x-small" (click)="suggestCustomer()"><i class="fa fa-search"></i></button>
+      </div>    
+        </div>
+        <div class="suggestions border p-2" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+          <!-- <strong> [ Customer Cd / Phone ] Name </strong> -->
+          <!-- <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomer"
+            (click)="SelectCustomer(cust)">{{'[' + cust.cust_cd + ' / '
+            + ((null === cust.phone) ? '' : cust.phone) +'] '
+            + cust.cust_name}}</p> -->
+            <table id="customers1">
+              <tr>
+                <th>
+                  Customer CD / Phone
+                </th>
+                <th>
+                  Name
+                </th>
+                <th>Guardian Name</th>
+                <th>Permanent Address</th>
+              </tr>
+                <tbody *ngFor="let cust of suggestedCustomer">
+                  <tr  (click)="SelectCustomer(cust)">
+                    <td>
+                      {{cust.cust_cd + 
+                         ((null === cust.phone) ? '' : ' / '+cust.phone)}}
+          
+                    </td>
+                    <td>
+                      {{cust.cust_name}}
+                    </td>
+                    <td>
+                      {{cust.guardian_name}}
+                    </td>
+                    <td>
+                      {{cust.permanent_address}}
+                    </td>
+                  </tr>
+                </tbody>
+                
+              
+             
+             
+
+            </table>
+        </div>
+        <div class="suggestions border p-2" style="width: 200%; font-size: small;"
+          *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+          <strong class="text-danger">" {{this.reportcriteria.controls.cust_name.value}} " does not match with any
+            customer</strong>
+        </div>
+        
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+<div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="trialbalance" ngxPrint>Print</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll" id="trialbalance">
+    <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+      <h3>{{ardbName}} {{branchName}}</h3>
+      <h3>Run Date & Time : {{today}} </h3> <br>
+      <h3>Net Worth Statement</h3>
+    </div>
+    <!-- <pagination style="float:right;" [totalItems]="reportData?.length" [itemsPerPage]="itemsPerPage"
+    [boundaryLinks]="true" [directionLinks]="true" [maxSize]="5" [(ngModel)]="currentPage" name="currentPage"
+    (pageChanged)="pageChanged($event)" (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+
+    <br>
+  <table class="p-3" style="width:100%; border-collapse: collapse; margin-bottom: 20px;" border="1" cellpadding="6">
+  <thead>
+    <tr style="background:#f1f1f1;">
+      <th>UCIC</th>
+      <th>Member ID</th>
+      <th>Name</th>
+      <th>Address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{custCD}}</td>
+      <td>{{memberID}}</td>
+      <td>{{custName}}</td>
+      <td>{{custAddr}}</td>
+    </tr>
+  </tbody>
+</table>
+
+  <div class="row" >
+    <div class="column">
+      <table id="trialbalance">
+          <tr>
+            <th>Acc Type</th>
+            <th>Acc Num</th>
+            <th style="text-align:right">Balance</th>
+            <th >Status</th>
+          </tr>
+            <tbody >
+          <tr *ngFor="let i of reportData1; let itr=index;" >
+            <td> {{i.acc_type_desc}}</td>
+            <td>{{i.acc_num}}</td>
+            <td style="text-align:right">{{i.clr_bal  | number : '1.2-2' }}</td>
+            <td *ngIf="i.acc_status=='O'" style="color: rgb(4, 104, 4);">Open</td>
+            <td *ngIf="i.acc_status=='C'" style="color: rgb(165, 12, 12);">Closed</td>
+          </tr>
+          <tr>
+            <td style="text-align:right;color: rgb(4, 104, 4);" >Total Open A/C Balance</td>
+            <td style="text-align:right;color: rgb(4, 104, 4);" >{{totalDepositOpenBal| number : '1.2-2'}}</td>
+            <td style="text-align:right;color: rgb(165, 12, 12);" >Total Close A/C Balance</td>
+            <td style="text-align:right;color: rgb(165, 12, 12);">{{totalDepositCloseBal| number : '1.2-2'}}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+            
+          <tr>
+            <td colspan="9"> <small>
+              This report is generated through SynergicBanking
+             </small> </td>
+          </tr>
+         </tfoot>
+      </table>
+    </div>
+    <div class="column">
+      <table id="trialbalance">
+        <tr>
+          <th>Loan Type</th>
+          <th>Loan ID</th>
+          <th  style="text-align:right">Curr Prn</th>
+          <th  style="text-align:right">Ovd Prn</th>
+          <th style="text-align:right">Curr Intt</th>
+          <th style="text-align:right">Ovd Intt</th>
+          <th style="text-align:right">Penal Intt</th>
+          <th style="text-align:right">Total Outstanding</th>
+          <th>Status</th>
+        </tr>
+          <tbody > 
+        <tr *ngFor="let i of reportData; let itr=index;">
+          <td>{{i.acc_desc}}</td>
+          <td>{{i.loan_id}}</td>
+          <td style="text-align:right">{{i.curr_prn  | number : '1.2-2'}}</td>
+          <td style="text-align:right">{{i.ovd_prn   | number : '1.2-2'}}</td>
+          <td style="text-align:right">{{i.curr_intt   | number : '1.2-2'}}</td>
+          <td style="text-align:right">{{i.ovd_intt   | number : '1.2-2'}}</td>
+          <td style="text-align:right">{{i.penal_intt   | number : '1.2-2'}}</td>
+          <td style="text-align:right">{{i.penal_intt+i.ovd_intt+i.curr_intt+i.ovd_prn+i.curr_prn   | number : '1.2-2'}}</td>
+          <td *ngIf="i.loan_status=='O'" style="color: rgb(4, 104, 4);">Open</td>
+          <td *ngIf="i.loan_status=='C'" style="color: rgb(187, 6, 6);">Closed</td>
+        </tr>
+          <tr>
+            <td style="text-align:right;color: rgb(4, 104, 4);" colspan="3" >Total Open A/C Outstanding</td>
+            <td style="text-align:right;color: rgb(4, 104, 4);" >{{totalDepositOpenBal| number : '1.2-2'}}</td>
+            <td style="text-align:right;color: rgb(165, 12, 12);" colspan="3">Total Close A/C Outstanding</td>
+            <td style="text-align:right;color: rgb(165, 12, 12);">{{totalDepositCloseBal| number : '1.2-2'}}</td>
+            <td>
+              
+            </td>
+          </tr>
+
+           
+      </tbody>
+      <tfoot>
+          
+      </tfoot>
+      </table>
+    </div>
+  </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [useExistingCss]="true"
+        printSectionId="trialbalance" ngxPrint>Print</button>
+      <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+
+    </div>
+  </div>
+</div>
+<loading *ngIf="isLoading"></loading>
+<loading *ngIf="isLoading"></loading>

@@ -1,0 +1,124 @@
+
+<loading *ngIf="isLoading"></loading>
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add New Gold Safe</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    
+    <form [formGroup]="locker">
+      <div class="col-12">
+        <div class="form-row">
+          <div class="form-group col-4">
+            <small for="acc_type">Safe Id<span class="text-danger">*</span></small>
+                <input type="number" readonly style="border-radius: 1.25rem!important;"  class="form-control form-control-sm custom-scrollbar" tabindex="1" formControlName="goldSafeId">
+            </div>
+            <div class="form-group col-4">
+            <small for="acc_type">Safe Name<span class="text-danger">*</span></small>
+              <input type="text" style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" tabindex="1" formControlName="goldSafeName">
+            </div>
+            <div class="form-group col-4">
+              <small for="acc_type">Branch<span class="text-danger">*</span></small>
+              <input type="text" style="border-radius: 1.25rem!important;" class="form-control form-control-sm custom-scrollbar" tabindex="1" formControlName="branch">
+
+            </div>
+          </div>
+      </div>
+    </form>
+    
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-primary" (click)="SaveLocker()">Save</button> &nbsp;
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<!-- <div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Retrive</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add New Safe</button>
+
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div> -->
+<div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>Error! </strong> {{alertMsg}}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; min-height: 90vh;">
+  
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-6 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-12 ">
+            <h4 class="customHeader">Gold Carat Details</h4>
+            
+            <form [formGroup]="form" (ngSubmit)="submit()">
+            <div formArrayName="rates">
+              <div *ngFor="let group of rateControls.controls; let i = index" [formGroupName]="i" class="rate-row">
+               
+                <div class="form-row">
+                  <div class="form-group col-4">
+                        <small for="acc_type">Carat<span class="text-danger">*</span></small>
+                        <select formControlName="karat"  class="form-control form-control-sm custom-scrollbar"  >
+                          <option *ngFor="let k of karatOptions" [ngValue]="k">{{ k }} Carat</option>
+                        </select>
+                  </div>
+
+                    <div class="form-group col-4">
+                      <small for="acc_type">Rate<span class="text-danger">*</span></small>
+                      <input type="number" formControlName="rate" placeholder="Enter rate"  class="form-control form-control-sm custom-scrollbar"/>
+                    </div>
+                    <div class="form-group col-4">
+                         <button type="button" (click)="updateRow()" class="btn btn-primary btn-sm ml-1 mr-1" style="margin-top: 9%;">Update</button>
+                         <button type="button" (click)="removeRate(i)" class="btn btn-primary btn-sm ml-1 mr-1" style="margin-top: 9%;">Remove</button>
+                  </div>
+                  </div>
+               
+              </div>
+            </div>
+            <button type="button" (click)="addRate()" class="btn btn-primary btn-sm ml-1 mr-2">Add Row</button>
+            <button type="submit" class="btn btn-primary btn-sm ml-2 mr-1">Insert Rates</button>
+            <button type="button" class="btn btn-primary btn-sm ml-2 mr-1" (click)="onBackClick()">Back</button>
+
+          </form>
+          </div>
+         
+        </div>
+      </div>
+        </div>
+  </div>
+
+</div>
+<div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>Error! </strong> {{alertMsg}}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<!-- <div class="row d-flex justify-content-center align-items-center"
+  style="background-color: #78c2ad21; text-align: center;">
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 mb-2 bg-white p-1">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="SubmitReport()">Retrive</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="AddLocker()">Add New Safe</button>
+
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="onBackClick()">Back</button>
+  </div>
+</div> -->
+<div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+      <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+      <span class="alert-text">{{ showMsg.Message }}</span>
+      <button  type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+      </button>
+    </div>

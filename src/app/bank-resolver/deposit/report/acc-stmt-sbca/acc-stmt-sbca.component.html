@@ -1,0 +1,369 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div class="form-row">
+        <div class="form-group col-3">
+          <small for="acc_type_cd">Account Type</small>
+          <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
+              (change)="onAccountTypeChange()">
+              <option *ngIf="AcctTypes" disabled>Choose</option>
+              <option *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+                {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+              </option>
+            </select>
+          <!-- <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
+          (change)="onAccountTypeChange()">
+            <option disabled>Choose</option>
+            <option [value]="1">1 - Saving Deposit</option>
+            <option [value]="7">7 - Share</option>
+            <option [value]="8">8 - Current</option> 
+            <option [value]="9">9 - Loan Suspense</option>
+          </select> -->
+        </div>
+        <div class="col-9">
+          <small for="acct_num" >Search Name/Cust code/Phone</small>
+        <div class="input-group">
+          <input type="text"class="form-control form-control-sm "
+          formControlName="acct_num" id="acct_num" placeholder="Enter Acc# / Customer Name / Phone number"
+          (input)="onChangeNull()" name="x-field-1" autocomplete="new-field-1">
+          <div class="input-group-append">
+            <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+              <i class="fa fa-search"></i> 
+            </button>
+          </div>
+          <br>
+          
+        </div>
+         
+          <div class="suggestionsTrf" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+            <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+              <thead>
+                <tr>
+                  <th scope="col">Acc#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Gurdian Name</th>
+                  <th scope="col">Address</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                  <td scope="row">{{cust.acc_num}}</td>
+                  <td>{{cust.cust_name}}</td>
+                  <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                  <td>{{cust.guardian_name}}</td>
+                  <td>{{cust.present_address}}</td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+        <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+        *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+        <strong class="text-danger">" {{this.reportcriteria.controls.acct_num.value}} " does not match with any customer</strong>
+        </div>
+        </div>
+        <div class="col-3"></div>
+        <div class="col-9"><div *ngIf="showWait">
+          Please wait...
+        </div></div>
+        <div class="col-6">
+          <small for="fromDate" >From Date</small>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button"  (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <small for="toDate" >To Date</small>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+            formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenToDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+      </div>
+   
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   [useExistingCss]="true"
+   class="btn btn-rounded btn-primary m-1" 
+   printSectionId="trial111" 
+   ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+  </div>
+  </div>
+
+<div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+  <!-- <div class="justify-content-center" style="text-align:center" *ngIf="reportData">
+    <h6>{{ardbName}} {{branchName}}</h6>
+
+    <h6>Run Date & Time : {{today}} </h6> <br>
+    <h6> <u> Account Statement SB/CA from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to {{ this.reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h6>
+  
+  </div>
+ <div>
+  <table  style="text-align:left;margin-left: 30%;" *ngIf="reportData">
+    <tr>
+      <th>A/C No. {{cAcc}}</th>
+    </tr>
+    <tr>
+      <th>Name: {{cName}}</th>
+    </tr>
+    <tr>
+      <th>Present Address:  {{cAddress}}</th>
+    </tr>
+  </table>
+ </div> -->
+
+ <!-- <mat-form-field appearance="outline">
+  <mat-label>Search Account Statement</mat-label>
+  <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+</mat-form-field> -->
+
+<div class="mat-elevation-z8" id="trial111">
+  
+  <table border="1" cellspacing="0" cellpadding="4" width="100%"
+       style="border-collapse: collapse; font-size: 14px;">
+  <thead>
+    <tr>
+      <th colspan="5" style="text-align: center; padding: 6px;">
+        <h5>{{ardbName}} ({{branchName}})</h5>
+        <h5>Run Date & Time : {{today}}</h5>
+        <h5>
+          <u>
+            Account Statement {{accountTypeName}}
+            from {{reportcriteria.controls.fromDate.value | date:'dd/MM/yyyy'}}
+            to {{reportcriteria.controls.toDate.value | date:'dd/MM/yyyy'}}
+          </u>
+        </h5><br><br>
+        <h5 style="text-align: left;font-size: larger; font-weight: 700; ">
+          A/C No:- {{cAcc}} <br>
+          Name:- {{cName}} <br>
+          Present Address:- {{cAddress}}
+        </h5>
+      </th>
+    </tr>
+
+    <tr style="background:#f0f0f0;">
+      <th style="text-align:center; width:120px;">Trans Dt</th>
+      <th style="text-align:left;">Particulars</th>
+      <th style="text-align:right; width:120px;">Debit</th>
+      <th style="text-align:right; width:120px;">Credit</th>
+      <th style="text-align:right; width:150px;">Balance</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let row of reportData" style="height:24px;">
+      <!-- if trans_dt = '28/12/2016 00:00' → take only date -->
+      <td style="text-align:center;">{{ row.trans_dt.split(' ')[0] }}</td>
+      <td style="text-align:left;">{{ row.particulars }}</td>
+      <td style="text-align:right;">{{ row.dr_amt | number:'1.2-2' }}</td>
+      <td style="text-align:right;">{{ row.cr_amt | number:'1.2-2' }}</td>
+      <td style="text-align:right;">{{ row.balance | number:'1.2-2' }}</td>
+    </tr>
+     <tr style="font-weight:bold; background:#f9f9f9;">
+    <td colspan="2" style="text-align:left;">Total</td>
+    <td style="text-align:right;">{{ opdrSum | number:'1.2-2' }}</td>
+    <td style="text-align:right;">{{ opcrSum | number:'1.2-2' }}</td>
+    <td></td>
+  </tr>
+  </tbody>
+
+  
+</table>
+
+  <!-- <footer><small>
+    This report is generated through SynergicBanking
+   </small></footer> -->
+</div>
+<!-- <mat-paginator showFirstLastButtons [pageSizeOptions]="[20, 30, 50, 100, this.reportData.length]" aria-label="Select page of users"></mat-paginator> -->
+
+ 
+
+
+ <!-- <pagination style="float:right;"
+[totalItems]="reportData?.length"  
+[itemsPerPage]="itemsPerPage"
+[boundaryLinks]="true"
+[directionLinks]="true"
+[maxSize]="5"
+[(ngModel)]="currentPage"
+name="currentPage"
+(pageChanged)="pageChanged($event)"
+(pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+ <table class="p-3" id="trial" hidden>
+  <tr *ngIf="reportData">
+    <!-- <th></th> -->
+    <th>Trans Dt</th>
+    <th >Instrument</th>
+    <th >Particulars</th>
+    <th style="text-align: right;"  >Debit</th>
+    <th style="text-align: right;" >Credit</th>
+   
+    
+   </tr>
+   <tbody *ngFor="let i of pagedItems; let itr=index;" >
+    <tr>
+      <td>{{i.trans_dt.substr(0,10)}}</td>
+      <td>{{i.instrument_num}}</td>
+      <td >{{i.particulars}}</td>
+      <td style="text-align: right;" >{{i.dr_amt | number : '1.2-2'}}</td>
+      <td style="text-align: right;">{{i.cr_amt | number : '1.2-2'}}</td>
+     
+      <!-- <td style="text-align:right">{{i.balance | number : '1.2-2'}}</td> -->
+    </tr>
+    <tr style="font-weight:700;" *ngIf="itr == reportData.length-1">
+   
+      <td colspan="3" style="text-align: right;font-weight: 700;">Total: </td>
+      <td style="text-align: right;font-weight: 700;">{{opdrSum | number : '1.2-2'}}</td>
+      <td style="text-align: right;font-weight: 700;">{{opcrSum | number : '1.2-2'}}</td>
+      
+    </tr>
+ 
+  
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="8"> <small>
+        This report is generated through SynergicBanking
+       </small> </td>
+    </tr></tfoot>
+ </table>
+ <div hidden id="hiddenTab">
+  <div class="justify-content-center" style="text-align:center">
+    <h4>{{ardbName}} {{branchName}}</h4>
+
+    <h4>Run Date & Time : {{today}} </h4> <br>
+    <h4> <u> Account Statement SB/CA from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to {{ this.reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4>
+
+
+
+ </div>
+ <table  style="text-align:left;margin-left: 28%;" *ngIf="reportData">
+  <tr>
+    <th>A/C No. {{cAcc}}</th>
+  </tr>
+  <tr>
+    <th>Name: {{cName}}</th>
+  </tr>
+  <tr>
+    <th>Present Address:  {{cAddress}}</th>
+  </tr>
+</table>
+<br>
+ <table class="p-3" id="trial1" class="mkSmall">
+  <thead>
+    <tr *ngIf="reportData">
+      <!-- <th></th> -->
+         <!-- <th></th> -->
+    <th>Trans Dt</th>
+    <th >Instrument</th>
+    <th >Particulars</th>
+    <th style="text-align: right;" >Debit</th>
+    <th style="text-align: right;" >Credit</th>
+   
+      
+     </tr>
+  </thead>
+ 
+  <tbody *ngFor="let i of reportData; let itr=index;" >
+    <tr>
+      <td>{{i.trans_dt.substr(0,10)}}</td>
+      <td>{{i.instrument_num}}</td>
+      <td >{{i.particulars}}</td>
+      <td style="text-align: right;">{{i.dr_amt | number : '1.2-2'}}</td>
+      <td style="text-align: right;">{{i.cr_amt | number : '1.2-2'}}</td>
+     
+      
+      <!-- <td style="text-align:right">{{i.balance | number : '1.2-2'}}</td> -->
+    </tr>
+    <tr style="font-weight:700;" *ngIf="itr == reportData.length-1">
+   
+      <td colspan="3" style="text-align: right;font-weight: 700;">Total: </td>
+      <td style="text-align: right;font-weight: 700;">{{opdrSum | number : '1.2-2'}}</td>
+      <td style="text-align: right;font-weight: 700;">{{opcrSum | number : '1.2-2'}}</td>
+      
+    </tr>
+    <!-- <tr *ngIf="i.cust_cd==lastcustcd">
+     <td colspan="8" style="text-align:right;font-weight:800">Total</td>
+     <td colspan="8" style="text-align:right;font-weight:800">{{opdrSum | number : '1.2-2'}}</td>
+    </tr> -->
+ 
+ </tbody>
+ <tfoot>
+  <tr>
+   <td>&nbsp;</td>
+   <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+   </tr>
+ 
+</tfoot>
+</table>
+<footer>
+  <small>
+    This report is generated through SynergicBanking
+   </small> 
+ </footer>
+<!-- <br><br><br><br>
+<small>This report is generated through SynergicBanking</small> -->
+ </div>
+<button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+</div>
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+<div>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+ <button mat-raised-button type="button" 
+ [useExistingCss]="true"
+ class="btn btn-rounded btn-primary m-1" 
+ printSectionId="trial111" 
+ ngxPrint>Print</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+</div>
+</div>
+</div>
+<loading *ngIf="isLoading"></loading>

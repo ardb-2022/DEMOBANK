@@ -1,0 +1,1239 @@
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center">
+ <ng-template #buttonDiv>
+  <div
+  class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="newAccount()">New</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="modifyData()">Modify</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+  <!-- <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" >Delete</button> -->
+  <button mat-raised-button type="button" [disabled]="!kycEnable" class="btn btn-primary btn-sm ml-1 mr-1"
+    (click)="openModal(kycContent)">Kyc</button>
+  <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData('N')">Save</button>
+
+  <!-- class="btn btn-primary btn-sm ml-1 mr-1" (click)="openModal(kycContent)" >Kyc</button> -->
+</div>
+ </ng-template>
+ <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+
+
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+
+
+    <h1></h1>
+    <h4 class="customHeader">Personal Information</h4>
+    <div class="form-row">
+      <div class="form-group col-3">
+        
+        <small for="loan_id">Loan ID</small>
+        <!-- <input style="height:25px; text-align-last: right;" [disabled]="operationType!='R' || disableAll == 'Y'"
+          type="text" class="form-control form-control-sm text-capitalize" id="loan_id" placeholder="Loan ID"
+          (change)="getLoanAccountData()" [(ngModel)]="tm_loan_all.loan_id"> -->
+      <div class="input-group">
+        <input style="height:25px; text-align-last: left;" [disabled]="operationType!='R' || disableAll == 'N'"
+          type="text" class="form-control form-control-sm text-capitalize" id="loan_id" placeholder="Loan ID"
+           [(ngModel)]="tm_loan_all.loan_id" (keyup)="disableonNull($event)">
+          <div class="input-group-append"> 
+            <button class="btn btn-primary btn-sm" [disabled]="disableLoanId"  (click)="getLoanAccountData(tm_loan_all.loan_id)"><i class="fa fa-search"></i></button>
+            </div>
+            <!-- {{disableLoanId}} -->
+            <div class="suggestions border p-2" *ngIf="allLoanDtls.length">
+              <table id="customers1">
+                <tr>
+                  <th> Loan ID</th>
+                  <th> Name</th>
+                  <th>Guardian Name</th>
+                <th>Permanent Address</th>
+                </tr>
+                <tbody *ngFor="let cust of allLoanDtls" >
+                  <!-- (click)="setCustDtls(cust.loan_id)" -->
+                  <tr (click)="getCustforLoan(cust)" >
+                    <td>
+                      {{cust.loan_id}}
+                    </td>
+                    <td>
+                      {{cust.cust_name}}
+          
+                    </td>
+                    <td>
+                      {{cust.guardian_name}}
+                    </td>
+                    <td>
+                      {{cust.permanent_address}}
+                    </td>
+                  </tr>
+                 
+                </tbody>
+                
+              </table>
+            </div>
+      </div>
+      </div>
+
+      <div class="form-group col-1">
+        <small for="cust_code">Customer Code</small>
+        <input style="height:25px" [readonly]="true" type="text" class="form-control form-control-sm text-capitalize"
+          id="cust_code" placeholder="Customer CD" [(ngModel)]="tm_loan_all.party_cd" id="cust_code">
+      </div>
+
+      <div class="form-group col-2">
+      <small for="cust_name">Customer Name</small>
+      <div class="input-group">
+        <input style="height:25px; text-align-last: left;"
+          [disabled]="tm_loan_all.loan_id != undefined || operationType == '' || disableAll == 'Y'" type="text"
+          class="form-control form-control-sm text-capitalize" id="cust_name" placeholder="Customer Name"
+          [(ngModel)]="tm_loan_all.cust_name" (input)="onChangeSearch()">
+          <div class="input-group-append">
+        <button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" style="font-size:x-small" (click)="suggestCustomer()"><i class="fa fa-search"></i></button>
+        </div>
+        <div class="suggestions border p-2" *ngIf="suggestedCustomer">
+          <!-- <strong> [ Customer Cd / Phone ] Name </strong> -->
+          <!-- <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let cust of suggestedCustomer"
+            (click)="setCustDtls(cust.cust_cd)">
+            {{'[' + cust.cust_cd + ' / '
+            + ((null === cust.phone) ? '' : cust.phone) +'] '
+            + cust.cust_name}}
+          </p> -->
+          <table id="customers2">
+            <tr>
+              <th> Customer Code / Phone</th>
+              <th> Name</th>
+            </tr>
+            <tbody *ngFor="let cust of suggestedCustomer" >
+              <tr  (click)="setCustDtls(cust.cust_cd)">
+                <td>
+                  {{cust.cust_cd}}  {{((null === cust.phone) ? '' : ' / '+ cust.phone)}}
+                </td>
+                <td>
+                  {{cust.cust_name}}
+      
+                </td>
+              </tr>
+             
+            </tbody>
+            
+          </table>
+        </div>
+      </div>
+        
+        <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+          *ngIf="showNoName">
+          <strong class="text-danger">" {{tm_loan_all.cust_name}} " does not match with any customer</strong>
+        </div>
+      </div>
+
+     
+      <div class="form-group col-3">
+        <small for="loan_type">Loan Type</small>
+        <select
+          style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+          [disabled]="tm_loan_all.loan_id != undefined || operationType == '' || disableAll == 'Y' "
+          [(ngModel)]="tm_loan_all.loan_acc_type" (change)="setLoanAccountType($event.target.value)" id="loan_type"
+          class="form-control form-control-sm">
+          <option [value]="tm_loan_all.loan_acc_type" [readonly]="true" selected>
+            {{tm_loan_all.acc_cd}}-{{tm_loan_all.loan_acc_type}}</option>
+          <option *ngFor="let l of accountTypeList" [value]="l.acc_type_cd">{{l.acc_type_cd}}-{{l.acc_type_desc}}</option>
+        </select>
+      </div>
+
+      <!-- <div class="form-group col-1"> 
+        <small>Ledger Folio No. / Bond No.</small>
+        <input class="form-control form-control-sm text-capitalize"
+          [disabled]="disableAll == 'Y' " id="bond_no" 
+          style="height:25px; text-align: right;" [(ngModel)]="tm_loan_all.loan_acc_no" type="text" placeholder="Bond No">
+      </div> -->
+      <!-- <div class="form-group col-1">
+        <small>Fund Type</small><span class="text-danger">*</span>
+        <select 
+          style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+          [(ngModel)]="tm_loan_all.fund_type"
+          (change)="setFundType($event.target.value)"
+          id="fund_type" [disabled]="appvSanction"
+          class="form-control form-control-sm">
+          <option value="" [readonly]="true" selected>Select</option>
+          <option *ngFor="let l of fundTypeList" [value]="l.value">{{l.name}}</option>
+        </select>
+      </div> -->
+
+      <div class="form-group col-3">
+        <small for=due_date>Inst. Start Dt / Due Dt </small><span class="text-danger">*</span>
+        <div class="input-group">
+          <input class="form-control form-control-sm text-capitalize" id="due_date" 
+            [disabled]=" disableAll == 'Y' ||appvSanction "
+            style="height:25px; text-align: right;" bsDatepicker 
+            [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [(ngModel)]="tm_loan_all.instl_start_dt" type="text" placeholder="DD/MM/YYYY" (ngModelChange)="rep_stDT()">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+
+      <div class="form-group col-2">
+        <small for=curr_int_rate>Current Interest Rate</small><span class="text-danger">*</span>
+        <input class="form-control form-control-sm text-capitalize"
+          [disabled]="disableAll == 'Y'|| appvSanction" id="curr_int_rate"
+          style="height:25px; text-align: right; float: none;" type="number" min="0" step='any'
+          [(ngModel)]="tm_loan_all.curr_intt_rate" (change)="checkAndSetOverdueInterest()" placeholder="Curr Int Rate">
+      </div>
+
+      <div class="form-group col-2">
+        <small>Overdue Interest Rate</small><span class="text-danger">*</span>
+        <input class="form-control form-control-sm text-capitalize"
+          [disabled]="disableAll == 'Y' ||appvSanction" id="ovd_int_rate"
+          style="height:25px; text-align: right;" type="number" min="0" step='any' [(ngModel)]="tm_loan_all.ovd_intt_rate"
+          placeholder="Customer Phone" placeholder="Overdue Interest Rate">
+      </div>
+
+      <div class="form-group col-2">
+        <small>Instalment No</small><span class="text-danger">*</span>
+        <input class="form-control form-control-sm text-capitalize"
+          [disabled]="appvSanction " id="instl_no"
+          style="height:25px; text-align: right;" type="number" min="0" step='any' [(ngModel)]="tm_loan_all.instl_no"
+          placeholder="Instalment No">
+      </div>
+
+      <div class="form-group col-2">
+        <small>Installment Type</small><span class="text-danger">*</span>
+        <select
+          style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+          [disabled]=" disableAll == 'Y'||appvSanction "
+          (change)="setInstalPeriod($event.target.value)" [(ngModel)]="tm_loan_all.piriodicity" id="loan_type"
+          class="form-control form-control-sm">
+          <option [value]="tm_loan_all.piriodicity" [readonly]="true" selected>
+            {{tm_loan_all.piriodicity}}-{{tm_loan_all.instalmentTypeDesc}}</option>
+          <option *ngFor="let l of instalmentTypeList" [value]="l.desc_type">{{l.desc_type}}-{{l.ins_desc}}</option>
+        </select>
+      </div>
+
+      <div class="form-group col-2">
+        <small>Repayment Formula</small><span class="text-danger">*</span>
+        <select 
+          style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+          [disabled]=" disableAll == 'Y'||appvSanction "
+          (change)="setRepaymentFormula($event.target.value)" [(ngModel)]="tm_loan_all.emi_formula_no" id="loan_type"
+          class="form-control form-control-sm">
+          <option  selected>Select</option>
+          <option *ngFor="let l of repaymentFormulaList" [value]="l.formula_no">{{l.formula_desc}}</option>
+        </select>
+      </div>
+
+      <!-- <div class="form-group col-1 "></div> -->
+      <div class="form-group col-2 " >
+      
+          <small>Ledger Folio No.</small>
+          <input class="form-control form-control-sm text-capitalize"
+            [disabled]="disableAll == 'Y' " id="bond_no" 
+            style="height:25px; text-align: right;" [(ngModel)]="tm_loan_all.loan_acc_no" type="text" placeholder="Ledger Folio No">
+       
+        <!-- <div class="container border" hidden>
+          <input type="checkbox" value="false" 
+            [disabled]="tm_loan_all.loan_id != undefined || operationType == '' || disableAll == 'Y' "
+            [(ngModel)]="tm_loan_all.cheque_facility" [checked]="tm_loan_all.cheque_facility == 'Y'"
+            (change)="tm_loan_all.cheque_facility = $event.target.checked ? 'Y' : 'N' ">
+          <small> Cheque Facility</small>
+        </div> -->
+      </div>
+      </div>
+
+  </div>
+
+
+  <!-- <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3" *ngIf="tm_loan_all.loan_id != undefined"> -->
+  <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3">
+    <div class="row">
+      <div class="col-12 ">
+         <h4 class="customHeader">Security Details</h4>
+          <form [formGroup]="securityForm" >
+            <div formArrayName="securities">
+              <div *ngFor="let group of securities.controls; let i = index" [formGroupName]="i" class="border p-3 my-3">
+
+                <!-- === Common Fields (ALL) === -->
+                <div class="row">
+                   <!-- Security Type Dropdown -->
+                  <div class="col-md-6">
+                     <label>Security Type</label>
+                    <select formControlName="sec_type" class="form-control" >
+                      <option *ngFor="let type of securityTypes" [value]="type.sec_type">
+                        {{ type.sec_desc }}
+                      </option>
+                    </select>
+
+                    <!-- <label>Security Type</label>
+                    <select (change)="onTypeChange($event, i)" class="form-control">
+                      <option *ngFor="let type of securityTypes" [value]="type.sec_type">
+                        {{ type.sec_desc }}
+                      </option>
+                    </select> -->
+                  </div>
+                  <div class="col-md-3">
+                    <label>Loan ID</label>
+                    <input type="text" formControlName="loan_id" readonly class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Account Code</label>
+                    <input type="text" formControlName="acc_cd" readonly class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>SL No</label>
+                    <input type="number" formControlName="sl_no" readonly class="form-control" />
+                  </div>
+                </div>
+
+                <hr>
+
+                <!-- === Gold Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'G'" class="row">
+                  <div class="col-md-1">
+                    <label>Quantity</label>
+                    <input type="number" formControlName="gold_qty" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Gross Wet. </label>
+                    <input type="number" formControlName="gold_gross_wt" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Net Wet. </label>
+                    <input type="number" formControlName="gold_net_wt" class="form-control" (change)="changeNetWt(+$event.target.value,i)"/>
+                  </div>
+                  <div class="col-md-1">
+                     <label for="acc_type">Karat</label>
+                        <select formControlName="karat"  class="form-control " (change)="getGoldRate(+$event.target.value,i)" >
+                          <option *ngFor="let k of AllgoldCatat" [value]="k.karat">{{ k.karat }} Karat</option>
+                        </select>
+                  </div>
+                  <div class="col-md-2">
+                    <label>Description</label>
+                    <input type="text" formControlName="gold_desc" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Unit Rate</label>
+                    <input type="number" formControlName="unit_rate" class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Gold Value</label>
+                    <input type="number" formControlName="gold_val" class="form-control" />
+                  </div>
+                  <div class="col-md-1">
+                    <label>Appraiser Id</label>
+                    <input type="text" formControlName="gold_appraiser_id" class="form-control" />
+                  </div>
+
+                  <div class="col-md-2">
+                    <label>Appraiser Name</label>
+                    <input type="text" formControlName="gold_appraiser_name" class="form-control" />
+                  </div>
+                  
+
+                </div>
+
+                <!-- === Certificate Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'N'" class="row">
+                  <div class="col-md-2">
+                    <label>Cert. Name 1</label>
+                    <input type="text" formControlName="cert_name1" class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Cert. Number</label>
+                    <input type="text" formControlName="cert_no" class="form-control" />
+                  </div>
+                  <div class="col-md-3">
+                    <label>Registration No</label>
+                    <input type="text" formControlName="regn_no" class="form-control" />
+                  </div>
+                   <div class="col-md-3">
+                    <label>Cert. Opening Dt.</label>
+                    <input type="date" formControlName="cert_opn_dt" class="form-control" />
+                  </div>
+                   <div class="col-md-3">
+                    <label>Cert. Mature Dt.</label>
+                    <input type="date" formControlName="cert_mat_dt" class="form-control" />
+                  </div>
+                   <div class="col-md-3">
+                    <label>Sum Assured</label>
+                    <input type="text" formControlName="sum_assured" class="form-control" />
+                  </div>
+                </div>
+
+                <!-- === LIC Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'L'" class="row">
+                  <div class="col-md-3">
+                    <label>Policy Name 1</label>
+                    <input type="text" formControlName="pol_name1" class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Policy Number</label>
+                    <input type="text" formControlName="pol_no" class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Policy Type</label>
+                    <input type="text" formControlName="pol_type" class="form-control" />
+                  </div>
+                  <div class="col-md-2">
+                    <label>Policy Branch Name</label>
+                    <input type="text" formControlName="pol_brn_name" class="form-control" />
+                  </div>
+                   <div class="col-md-2">
+                    <label>Policy Surrender value</label>
+                    <input type="text" formControlName="pol_sur_val" class="form-control" />
+                  </div>
+                    <div class="col-md-3">
+                    <label>Policy Opening Dt.</label>
+                    <input type="date" formControlName="pol_opn_dt" class="form-control" />
+                  </div>
+                    <div class="col-md-3">
+                    <label>Policy Mature Dt.</label>
+                    <input type="date" formControlName="pol_mat_dt" class="form-control" />
+                  </div>
+                </div>
+                 <!-- === Deposit Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'D'" class="row">
+                <div class="col-md-3">
+                  <label>Account Type Code</label>
+                  <select style="height:25px; font-size: medium; align-content:center; padding-top: 0px; background-color: rgb(253, 253, 253);"
+                          formControlName="acc_type_cd" id="acc_type_cd"
+                          class="form-control form-control-sm">
+                          <option [readonly]="true" selected>Select Acc Type</option>
+                          <option *ngFor="let l of depositAccountTypeList" [value]="l.acc_type_cd">{{l.acc_type_cd}}-{{l.acc_type_desc}}</option>
+                  </select>
+                  <!-- <input type="number" formControlName="acc_type_cd" class="form-control" /> -->
+                </div>
+            <!-- <div class="form-group col-md-3">
+            <small for="acct_num">Search by Cust CD / Name</small>
+            <span class="badge badge-warning pull-right" *ngIf="this.CustomerName"> 
+                Cust Name:-{{this.CustomerName?.cust_name}}
+               </span>
+            <div class="input-group">
+              <input type="text"  class="form-control form-control-sm "
+                formControlName="acc_num" id="acc_num"
+                name="x-field-1" autocomplete="new-field-1" >
+                <div class="input-group-append">
+                <button class="btn btn-primary btn-sm"  (click)="suggestCustomer2()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="suggestions2" *ngIf="suggestedCustomer2 && suggestedCustomer2.length>0">
+              <table class="table table-hover table-bordered table-sm w-auto small" id="customers2">
+               <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer2" (click)="SelectCustomer(cust,i)">
+                    <td scope="row">{{cust.acc_num}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 150%; font-size: small;" *ngIf="shownoresult">
+              <strong class="text-danger">" {{group.get('acc_num')?.value}} " does not match with any Deposit A/C</strong>
+            </div>
+          </div> -->
+            <div class="form-group col-md-3 position-relative" style="margin-top: 5px;">
+      <small for="acct_num">Search Account</small>
+      <span class="badge badge-warning pull-right" *ngIf="this.depositDTLS?.agent_cd">
+        Agent Name:-{{group.get('dh_name1')?.value}}
+      </span>
+
+      <div class="input-group">
+        <input type="text" class="form-control form-control-sm"
+          formControlName="acc_num" id="acc_num"
+          (focus)="selectedIndexForSuggestion = i"
+          name="x-field-1" autocomplete="new-field-1">
+        <div class="input-group-append">
+          <button class="btn btn-primary btn-sm" (click)="suggestCustomer2(i)">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="suggestions2"
+        *ngIf="suggestedCustomer2?.length > 0 && selectedIndexForSuggestion === i">
+        <table class="table table-hover table-bordered table-sm w-auto small" id="customers2">
+          <tr>
+            <th>Acc#</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Guardian Name</th>
+            <th>Address</th>
+          </tr>
+          <tr *ngFor="let cust of suggestedCustomer2" (click)="SelectCustomer(cust, i)">
+            <td>{{cust.acc_num}}</td>
+            <td>{{cust.cust_name}}</td>
+            <td>{{cust.phone || ''}}</td>
+            <td>{{cust.guardian_name}}</td>
+            <td>{{cust.present_address}}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+        *ngIf="shownoresult && selectedIndexForSuggestion === i">
+        <strong class="text-danger">" {{group.get('acc_num')?.value}} " does not match with any Deposit A/C</strong>
+      </div>
+    </div>
+                <!-- <div class="col-md-3">
+                  <label>Account Number</label>
+                  <input type="text" formControlName="acc_num" class="form-control" />
+                </div> -->
+                <div class="col-md-2">
+                  <label>Opening Date</label>
+                  <input type="date" formControlName="opn_dt" [disabled]="disableAll == 'Y'" class="form-control" />
+                </div>
+                <div class="col-md-1">
+                  <label>Prn. Amount</label>
+                  <input type="number" formControlName="prn_amt" [disabled]="disableAll == 'Y'" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                  <label>Maturity Date</label>
+                  <input type="date" formControlName="mat_dt" [disabled]="disableAll == 'Y'" class="form-control" />
+                </div>
+                <div class="col-md-1">
+                  <label>Maturity Value</label>
+                  <input type="number" formControlName="mat_val" [readOnly]="true" class="form-control" />
+                </div>
+                </div>
+                 <!-- === Stock Fields === -->
+                <div *ngIf="group.get('sec_type')?.value === 'S'" class="row">
+                  <div class="col-md-6">
+                    <label>Stock Type</label>
+                    <input type="text" formControlName="stock_type" class="form-control" />
+                  </div>
+                  <div class="col-md-6">
+                    <label>Stock Value</label>
+                    <input type="number" formControlName="stock_value" class="form-control" />
+                  </div>
+                </div>
+                 <!-- === housing Fields === -->
+
+                  <div *ngIf="group.get('sec_type')?.value === 'H'" class="row">
+                <!-- Owner Details -->
+                <div class="col-md-3" *ngFor="let i of [1,2,3,4,5]">
+                  <label>Owner Name {{i}}</label>
+                  <input type="text" [formControlName]="'dh_name' + i" class="form-control" />
+                </div>
+
+                <!-- Property Information -->
+                <div class="col-md-3">
+                  <label>Property Type</label>
+                  <input type="text" formControlName="prop_type" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                  <label>Property Address</label>
+                  <input type="text" formControlName="prop_addr" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Total Land Area</label>
+                  <input type="text" formControlName="to_lnd_area" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Total Covered Area</label>
+                  <input type="text" formControlName="tot_cv_area" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Deed Number</label>
+                  <input type="text" formControlName="deed_no" class="form-control" />
+                </div>
+
+                <!-- Location Details -->
+                <div class="col-md-3">
+                  <label>District</label>
+                  <input type="text" formControlName="distct" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Police Station</label>
+                  <input type="text" formControlName="ps" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Mouza</label>
+                  <input type="text" formControlName="mouza" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>JL Number</label>
+                  <input type="text" formControlName="jl_no" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>RS Khatian</label>
+                  <input type="text" formControlName="rs_kha" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>LR Khatian</label>
+                  <input type="text" formControlName="lr_kha" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>RS Dag</label>
+                  <input type="text" formControlName="rs_dag" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>LR Dag</label>
+                  <input type="text" formControlName="lr_dag" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Municipality</label>
+                  <input type="text" formControlName="deed_muni" class="form-control" />
+                </div>
+
+                <!-- House/Building Specific -->
+                <div class="col-md-3">
+                  <label>Ward No</label>
+                  <input type="text" formControlName="ward_no" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Holding No</label>
+                  <input type="text" formControlName="holding_no" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Boundry</label>
+                  <input type="text" formControlName="boundry" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Construction Year</label>
+                  <input type="text" formControlName="cnst_yr" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Floor Area</label>
+                  <input type="text" formControlName="floor_area" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Market Value</label>
+                  <input type="number" formControlName="mkt_val" class="form-control" />
+                </div>
+
+                <!-- Tax & Deed -->
+                <div class="col-md-3">
+                  <label>Tax Paid Up To</label>
+                  <input type="date" formControlName="tax_upto" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Block/RO Tax</label>
+                  <input type="text" formControlName="bl_ro_tax" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Mortgage Deed Registration No</label>
+                  <input type="text" formControlName="mort_deed_reg_no" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                  <label>Mortgage Deed Date</label>
+                  <input type="date" formControlName="mort_deed_dt" class="form-control" />
+                </div>
+              </div>
+
+                <div class="text-right mb-3">
+                  
+        
+                  <button  type="button" style="max-height: 27px;" class="btn btn-primary btn-sm"
+                      (click)="removeSecurity(i)">
+                      <i class="fa fa-minus-circle" aria-hidden="true"></i>
+                      </button>
+                </div>
+                  
+                <!-- <button type="button" class="btn btn-danger mt-3" (click)="removeSecurity(i)">Remove</button> -->
+              </div>
+            </div>
+            <div class="text-right mb-3" >
+              <button type="button" style=" max-height: 27px;" [disabled]="disableAll == 'Y'" class="btn btn-primary btn-sm mr-2"
+                    (click)="addSecurity()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </button>
+            </div>
+            <!-- <button type="button" class="btn btn-primary" (click)="addSecurity()">Add More Security</button> -->
+            <!-- <button type="submit" class="btn btn-success text-right" (click)="onSecuritySave()">Save Security</button> -->
+          </form>
+     </div>
+     </div>
+    <div class="row">
+      <div class="col-12 ">
+
+        <!-- <h1></h1>
+        <h4 class="customHeader">Guaranter Details</h4>
+
+        <div class="form-row">
+          <div class="form-group col-4">
+            <small>Guaranter Name</small>
+            <input class="form-control form-control-sm text-capitalize" id="guaranter_name"
+              style="height:25px; text-align: left;" type="text" placeholder="Guaranter Name"
+              [disabled]="disableAll == 'Y' " [(ngModel)]="tm_guaranter.gua_name">
+          </div>
+
+          <div class="form-group col-8">
+            <small>Guaranter Address</small>
+            <input class="form-control form-control-sm text-capitalize" id="guaranter_addr"
+              style="height:25px; text-align: left;" [disabled]="disableAll == 'Y' " type="text"
+              placeholder="Guaranter Address" [(ngModel)]="tm_guaranter.gua_add">
+          </div>
+        </div> -->
+<!-- 
+        <div class="form-row">
+          <div class="form-group col-4">
+            <small>Father's Name</small>
+            <input class="form-control form-control-sm text-capitalize" id="fathers_name"
+              style="height:25px; text-align: left;" [disabled]="disableAll == 'Y' " type="text"
+              placeholder="Father's Name" [(ngModel)]="tm_guaranter.office_name">
+          </div>
+
+          <div class="form-group col-3">
+            <small>Monthly Income</small>
+            <input class="form-control form-control-sm text-capitalize" id="fathers_name"
+              style="height:25px; text-align: right;" [disabled]="disableAll == 'Y' " type="number"
+              placeholder="Monthly Income" [(ngModel)]="tm_guaranter.salary">
+          </div>
+
+          <div class="form-group col-3">
+            <small>Mobile No.</small>
+            <input class="form-control form-control-sm text-capitalize" id="guaranter_mobile"
+              style="height:25px; text-align: left;" [disabled]="disableAll == 'Y' " type="text" placeholder="Mobile No"
+              [(ngModel)]="tm_guaranter.mobile">
+          </div>
+
+          <div class="form-group col-2 ">
+            <br>
+            <div class="container border">
+              <input type="checkbox" value="false" [(ngModel)]="tm_guaranter.sec_58" [checked]="tm_guaranter.sec_58 == 'Y'"
+                [disabled]="disableAll == 'Y' " (change)="tm_guaranter.sec_58 = $event.target.checked ? 'Y' : 'N' ">
+              <small> SEC 58</small>
+            </div>
+          </div>
+
+        </div> -->
+
+
+        <div class="form-row " style=" border-top: 3px solid gainsboro;">
+          <div class="col-4 border-right">
+            <h1></h1>
+            <h4 class="customHeader">Loan Agent & SI Details</h4>
+
+            <section>
+              <div class="form-row ">
+                <div class="form-group col-4">
+                  <small>Agent Code</small>
+                  <input class="form-control form-control-sm text-capitalize" id="l.sanc_no"
+                    style="height:25px; text-align: right;" [readonly]="true" [disabled]="disableAll == 'Y'"
+                    [(ngModel)]="LoanAgentDetailsForSI.agent_cd" type="number" min="0" step='any' placeholder="Agent Code">
+                </div>
+
+                <div class="form-group col-8">
+                  <small for="rec_sb_ac_no">Agent Name</small>
+                  
+                  <div class="input-group">
+                  <input [disabled]="disableAll == 'Y'" [(ngModel)]="LoanAgentDetailsForSI.agent_name" style="height:25px" type="text"
+                    class="form-control form-control-sm"  id="rec_sb_ac_no">
+                    <!-- (focusout)="validateSbAccount()" -->
+                    <div class="input-group-append">
+                      <button class="btn btn-primary btn-sm"  (click)="suggestAgent()">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                </div>
+               
+                <div class="DDsuggestions" *ngIf="suggestedAgent && suggestedAgent.length>0">
+          <!-- <div class="suggestions" *ngIf="suggestedCustomer"> -->
+                <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+                  <!-- <thead> -->
+                    <tr>
+                      <th scope="col">Acc#</th>
+                      <th scope="col">Name</th>
+                    </tr>
+                  <!-- </thead> -->
+                  <tbody>
+                    <tr *ngFor="let cust of suggestedAgent" (click)="SelectAgent(cust)">
+                      <td scope="row">{{cust.agent_cd}}</td>
+                      <td>{{cust.agent_name}}</td>
+                      
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="suggestions border p-2" style="top: 10%;z-index: 10;width: 80%; font-size: small;" *ngIf="shownoresult3">
+                <strong class="text-danger">" {{LoanAgentDetailsForSI.agent_name}} " does not match with any Agent</strong>
+                <!-- <strong class="text-danger" *ngIf="!resetClicked">" {{this.f.acct_num.value}} " does not match with any customer</strong> -->
+              </div>
+                </div>
+                
+              </div>
+              <div class="form-row ">
+                <div class="form-group col-2">
+                  <small>Acc Code</small>
+                  <input class="form-control form-control-sm text-capitalize" id="l.sanc_no"
+                    style="height:25px; text-align: right;" [readonly]="true"
+                    [(ngModel)]="LoanDetailsForSI.dr_acc_type" type="number"  placeholder="Acc CD">
+                </div>
+
+                <div class="form-group col-7">
+                  <small for="rec_sb_ac_no">DDS Account No</small>
+                  <span class="badge badge-warning pull-right" *ngIf="LoanDetailsForSI.modified_by"> 
+                  Name:-{{LoanDetailsForSI.modified_by}}
+                 </span>
+                  <div class="input-group">
+                  <input  [(ngModel)]="LoanDetailsForSI.dr_acc_num" [disabled]="disableAll == 'Y'" style="height:25px" type="text"
+                    class="form-control form-control-sm"  id="rec_sb_ac_no">
+                    <!-- (focusout)="validateSbAccount()" -->
+                    <div class="input-group-append">
+                      <button class="btn btn-primary btn-sm"  (click)="suggestCustomer3()">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                </div>
+                <div class="DDsuggestions" *ngIf="suggestedDDCustomer && suggestedDDCustomer.length>0">
+          <!-- <div class="suggestions" *ngIf="suggestedCustomer"> -->
+          <table class="table table-hover table-bordered table-sm w-auto small" id="customers1">
+            <!-- <thead> -->
+              <tr>
+                <th scope="col">Acc#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Guardian Name</th>
+                <th scope="col">Address</th>
+              </tr>
+            <!-- </thead> -->
+            <tbody>
+              <tr *ngFor="let cust of suggestedDDCustomer" (click)="SelectCustomer3(cust)">
+                <td scope="row">{{cust.acc_num}}</td>
+                <td>{{cust.cust_name}}</td>
+                <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                <td>{{cust.guardian_name}}</td>
+                <td>{{cust.present_address}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="suggestions border p-2" style="width: 150%; font-size: small;" *ngIf="shownoresult">
+          <strong class="text-danger">" {{LoanDetailsForSI.dr_acc_num}} " does not match with any customer</strong>
+          <!-- <strong class="text-danger" *ngIf="!resetClicked">" {{this.f.acct_num.value}} " does not match with any customer</strong> -->
+        </div>
+                </div>
+                <div class="form-group col-3">
+                  <small>Min Bal</small>
+                  <input class="form-control form-control-sm text-capitalize" id="l.sanc_no"
+                    style="height:25px; text-align: right;" [disabled]="disableAll == 'Y'"
+                    [(ngModel)]="LoanDetailsForSI.min_bal" type="number" min="0" step='any' placeholder="Min Bal">
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-8 border-left">
+            <h1></h1>
+            <h4 class="customHeader">Joint Holder</h4>
+            <section *ngFor="let t1 of td_accholder; let i = index">
+              <div class="form-row ">
+                <div class="form-group col-3">
+                  <small for="joint_cust_code">Customer Code</small>
+                  <input style="height:25px" [readonly]="true" type="text" class="form-control form-control-sm text-capitalize"
+                    [(ngModel)]="t1.cust_cd" placeholder="Customer Code" id="joint_cust_code" placeholder="Customer Code">
+                </div>
+
+
+                <div class="form-group col-6">
+                  <small for="joint_cust_name">Name</small>
+                <div class="input-group">
+   
+                  <input style="height:25px; text-align-last: left;" type="text"
+                    class="form-control form-control-sm text-capitalize" id="joint_cust_name"
+                    placeholder="Joint Holder Name" [disabled]="disableAll == 'Y' " [(ngModel)]="t1.acc_holder"
+                    (input)="noJointOnNull(i)">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary btn-sm" style="font-size:x-small" [disabled]="disabledJointOnNull" (click)="suggestJointCustomer(i)">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+
+                  </div>
+                  <div class="suggestions border p-2"
+                    *ngIf="suggestedJointCustomer && i==suggestedCustomerJointHolderIdx">
+                    <!-- <strong> [ Customer Cd / Phone ] Name </strong> -->
+                    <!-- <p style="margin-bottom:.2rem; cursor: pointer;" *ngFor="let jc of suggestedJointCustomer"
+                      (click)="setJointCustDtls(jc.cust_cd , i)">
+                      {{'[' + jc.cust_cd + ' / '
+                      + ((null === jc.phone) ? '' : jc.phone) +'] '
+                      + jc.cust_name}}
+                    </p> -->
+                    <table id="customers1">
+                      <tr>
+                        <th> Customer Code / Phone</th>
+                        <th> Name</th>
+                      </tr>
+                      <tbody *ngFor="let jc of suggestedJointCustomer" >
+                        <tr  (click)="setJointCustDtls(jc.cust_cd , i)">
+                          <td>
+                            {{jc.cust_cd}}  {{((null === jc.phone) ? '' : ' / '+ jc.phone)}}
+                          </td>
+                          <td>
+                            {{jc.cust_name}}
+                
+                          </td>
+                        </tr>
+                       
+                      </tbody>
+                      
+                    </table>
+                  </div>
+                  <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+                  *ngIf="showNoJoint">
+                  <strong class="text-danger">" {{t1.acc_holder}} does not match with any customer</strong>
+                  <!-- <strong class="text-danger" *ngIf="!resetClicked">" {{this.f.acct_num.value}} " does not match with any customer</strong> -->
+                   </div> 
+                </div>
+
+                <div class="form-group col-3">
+                  <small for="relation">Relation</small> <br>
+                  <select
+                    style="height:25px; text-align-last: left; font-size: small; padding-top: 0px; background-color: whitesmoke;"
+                    id="relation" [disabled]="disableAll == 'Y' " [(ngModel)]="t1.relation"
+                    (change)="setJointHolderRelation($event.target.value , i)" class="form-control form-control-sm">
+                    <option [value]="t1.relation" [readonly]="true" selected>{{t1.relationId}}-{{t1.relation}}</option>
+                    <option *ngFor="let l of relationship" [value]="l.val">{{l.id}}-{{l.val}}</option>
+                  </select>
+
+                </div>
+              </div>
+            </section>
+            <div class="text-right mb-3">
+              <button type="button" style=" max-height: 27px;" class="btn btn-primary btn-sm mr-2"
+                (click)="addJointHolder()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+              </button>
+    
+              <button  type="button" style="max-height: 27px;" class="btn btn-primary btn-sm"
+                (click)="removeJointHolder()">
+                <i class="fa fa-minus-circle" aria-hidden="true"></i>
+              </button>
+            </div>
+            <!-- <div class="text-right mb-3">
+            <button mat-raised-button type="button" style="height:22px; padding-top: 0px;"  class="btn btn-primary btn-sm" (click)="addJointHolder()">
+              <i class="fa fa-plus-circle" aria-hidden="true"></i>
+             </button>
+
+             <button mat-raised-button type="button" style="height:22px; padding-top: 0px;"  class="btn btn-primary btn-sm" (click)="removeJointHolder()">
+              <i class="fa fa-minus-circle" aria-hidden="true"></i>
+             </button>
+            </div> -->
+
+          </div>
+        </div>
+
+        <!-- || ls.approval_status == 'A' -->
+       
+
+        <section *ngFor="let ls of tm_loan_sanction_dtls; let i = index">
+          <div class="form-row">
+          <div class="col-4 border-right">
+            <h1></h1>
+            <h4 class="customHeader">All Sanction</h4>
+
+            <section *ngFor="let l of tm_loan_sanction; let i=index">
+              <div class="form-row ">
+                <div class="form-group col-3">
+                  <small>Sanc No</small>
+                  <input class="form-control form-control-sm text-capitalize" id="l.sanc_no"
+                    style="height:25px; text-align: right;" [readonly]="true"
+                    [(ngModel)]="l.sanc_no" type="number" min="0" step='any' placeholder="Sanction No">
+                </div>
+
+                <div class="form-group col-1"></div>
+                <div class="form-group col-7">
+                  <small for=sanc_date>Sanction Date<span class="text-danger">*</span></small>
+                  <div class="input-group">
+                    <input class="form-control form-control-sm text-capitalize" id="sanc_date"
+                      style="height:25px; text-align: right;" bsDatepicker
+                      [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                      [disabled]="disableAll == 'Y' || l.approval_status== 'A'"
+                      [(ngModel)]="l.sanc_dt" type="text" placeholder="DD/MM/YYYY">
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-8 border-left">
+              <h1></h1>
+              <h4 class="customHeader">Sanction Details</h4>
+            <div class="form-row ">
+               <div class="form-group col-3">
+              <small>Sector</small><span class="text-danger">*</span>
+              <select
+                style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                [disabled]="disableAll == 'Y'|| appvSanction" [(ngModel)]="ls.sector_cd"
+                (change)="setSectorType($event.target.value , i)" id="sec_type" 
+                class="form-control form-control-sm">
+                <!-- <option [value]="ls.sector_cd" [readonly]="true" selected>{{ls.sector_desc}}</option> -->
+                <option >Select Sector</option>
+                <option *ngFor="let t of sectorList" [value]="t.sector_cd">{{t.sector_desc}}</option>
+              </select>
+            </div>
+
+            <div class="form-group col-2">
+              <small>Activity</small><span class="text-danger">*</span>
+              <select
+                style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                [disabled]="disableAll == 'Y' || appvSanction" [(ngModel)]="ls.activity_cd"
+                (change)="setActivityType($event.target.value , i)" id="act_type" class="form-control form-control-sm">
+                <!-- <option [value]="ls.activity_cd" [readonly]="true" selected>{{ls.activity_desc}}</option> -->
+                <option >Select Activity</option>
+                <option *ngFor="let t of selectedActivityList" [value]="t.activity_cd">
+                  {{t.activity_desc}}</option>
+              </select>
+            </div>
+
+
+            <div class="form-group col-2">
+              <small>Activity Details</small><span class="text-danger">*</span>
+              <select
+                style="height:25px; font-size: small; align-content:center; padding-top: 0px; background-color: whitesmoke;"
+                [disabled]="disableAll == 'Y' ||appvSanction " [(ngModel)]="ls.crop_cd" (change)="setCorpType($event.target.value , i)"
+                id="act_type" class="form-control form-control-sm">
+                <option >Select Activity</option>
+                <!-- <option [value]="ls.crop_cd" [readonly]="true" selected>{{ls.crop_cd}}-{{ls.crop_desc}}</option> -->
+                <option *ngFor="let t of selectedCorpList" [value]="t.crop_cd">{{t.crop_cd}}-{{t.crop_desc}}</option>
+              </select>
+            </div>
+
+            <div class="form-group col-2">
+              <small>Sanction Amount</small><span class="text-danger">*</span>
+              <input class="form-control form-control-sm text-capitalize"
+                [disabled]="(tm_loan_all.acc_cd==23103 && ls.crop_cd !== '00')|| disableAll == 'Y' || ls.approval_status == 'A'"
+                (change)="setValidityDate(i)" [(ngModel)]="ls.sanc_amt" style="height:25px; text-align: right;"
+                id="sanc_amount" type="number" min="0" step='any' placeholder="Sanction Amount">
+            </div>
+
+
+            <div class="form-group col-2">
+              <small for=due_date>Validity Date</small><span class="text-danger">*</span>
+              <div class="input-group">
+                <input class="form-control form-control-sm text-capitalize" id="validity_date" [disabled]="disableAll == 'Y' || ls.approval_status == 'A' "
+                  style="height:25px; text-align: right;" bsDatepicker
+                  [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" type="text" 
+                  [(ngModel)]="ls.due_dt" type="text" placeholder="DD/MM/YYYY">
+              </div>
+            </div>
+
+            <!-- <div class="form-group col-1" *ngIf="disableAll == 'N'"> -->
+            <div class="form-group col-1">
+              <!-- {{ls.approval_status }} {{disableAll}}              -->
+              <button mat-raised-button type="button" style="padding-top: 0px; width:10px" class="btn btn-primary btn-sm ml-1 mr-1 mt-4"
+                [disabled]=" (ls.approval_status == undefined || ls.approval_status == 'A' || disableAll == 'Y')"
+                (click)="approveData(i)">
+                <small>
+                  Approve
+
+                </small>
+              </button>
+
+            </div>
+            </div>
+          </div>
+           
+          </div>
+        </section>
+
+      </div>
+      
+
+      <!-- <div class="col-4 border-left">
+        <h1></h1>
+        <h4 class="customHeader">Security Details</h4>
+        <div class="scroll-style">
+         
+          <section *ngFor="let set of td_loan_sanc_set_list; let i=index">
+
+            <section *ngFor="let rec of set.tdloansancset; let j=index">
+
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <input class="form-control form-control-sm text-capitalize" [readonly]="true" style="height:25px; text-align: rigt;"
+                  [(ngModel)]="rec.param_desc" id="sec_val" type="text" placeholder="SecurityQ">
+                </div>
+
+                <div *ngIf="rec.param_type=='CHAR'" class="form-group col-6">
+                  <input class="form-control form-control-sm text-capitalize" style="height:25px; text-align: left;" (change)="getAccountData()"
+                  [(ngModel)]="rec.param_value" [disabled]="disableAll == 'Y' " type="text" id="sec_val" placeholder="Enter Text">
+                </div>
+
+                <div *ngIf="rec.param_type=='NUMBER'" class="form-group col-6">
+                  <input class="form-control form-control-sm text-capitalize" style="height:25px; text-align: left;"
+                  [(ngModel)]="rec.param_value" [disabled]="disableAll == 'Y' " type="number" min="1" id="sec_val" placeholder="Enter Value">
+                </div>
+
+                <div *ngIf="rec.param_type=='DATE'" class="form-group col-6">
+                  <div class="input-group">
+                    <input class="form-control form-control-sm text-capitalize" id="sanc_date"
+                      style="height:25px; text-align: left;" bsDatepicker
+                      [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                      [(ngModel)]="rec.param_value_dt" [disabled]="disableAll == 'Y' " type="text" placeholder="DD/MM/YYYY">
+
+                  </div>
+                </div>
+              </div>
+            </section>
+            <hr>
+          </section>
+        </div>
+
+        
+        <div class="text-right mb-3" >
+          <button  type="button" style="height:22px; padding-top: 0px;"  [disabled]="disableAll == 'Y' "
+           class="btn btn-primary btn-sm" (click)="openModalC1(contentLoanStmt)">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+           </button>
+
+           <button  type="button" style="height:22px; padding-top: 0px;"  [disabled]="disableAll == 'Y' "
+            class="btn btn-primary btn-sm" (click)="removeSecurityDtlList()">
+            <i class="fa fa-minus-circle" aria-hidden="true"></i>
+           </button>
+       </div>
+        <h4 class="customHeader">Account Details</h4>
+        <div class="scroll-style">
+          
+            <div *ngIf="SecaccCD">
+
+              <div class="form-row">
+    
+               
+                <span class="badge badge-warning pull-right" *ngIf="!accName"> 
+                  Customer Name:-{{CustomerName.cust_name}}
+                 </span>
+                <div class="form-group col-12">
+                 
+                  <div class="container border">
+                    <div class="form-row">
+                      
+                      <div class="form-group col-7">
+                        <small for="dep_yr">Deposit Period</small>
+                        <input [disabled]='disableAll' [(ngModel)]="newtm_deposit.dep_period" style="height:20px" type="text"
+                         class="form-control form-control-sm text-capitalize" id="dep_pr">
+                      </div>
+                      <div class="form-group col-5">
+                        <small for="dbs_acc_open_dt">Maturity Date</small>
+                        <input [readonly]="true" style="height:20px;" type="text" placeholder="dd/mm/yyyy" class="form-control"
+                          [(ngModel)]="newtm_deposit.mat_dt" [readonly]="true" >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-group col-3">
+                  <small for="dep_intt_rate">Intt Rate</small>
+                  <input [disabled]='disableAll' [(ngModel)]="newtm_deposit.intt_rt"
+                    style="height:20px; text-align-last: right;" type="number" min="0" step='any'
+                    class="form-control form-control-sm text-capitalize" id="intrate">
+                </div>
+    
+                <div class="form-group col-5">
+                  <small for="dep_principal">Principal</small>
+                  <input [disabled]='disableAll' [(ngModel)]="newtm_deposit.prn_amt"
+                    style="height:20px; text-align-last: right;" type="number" min="0" value='.00' step='any'
+                    class="form-control form-control-sm text-capitalize" id="principal">
+                </div>
+    
+                <div class="form-group col-4">
+                  <small for="dep_interest">Interest</small>
+                  <input [readonly]="true" [(ngModel)]="newtm_deposit.intt_amt" style="height:20px; text-align-last: right;"
+                    type="number" min="0" step='any' class="form-control form-control-sm text-capitalize" id="dep_interest">
+                </div>
+              </div>
+    
+    
+    
+              <div class="form-row">
+                
+    
+                <div class="form-group col-3">
+                  <small for="dep_cert_no">Cert. No.</small>
+                  <input [disabled]='disableAll' [(ngModel)]="newtm_deposit.cert_no" style="height:20px" type="text"
+                    class="form-control form-control-sm text-capitalize" id="dep_cert_no">
+                </div>
+
+                <div class="form-group col-3">
+                  <small for="dep_cert_no">S/B Account No</small>
+                  <input [disabled]='disableAll' [(ngModel)]="newtm_deposit.user_acc_num" style="height:20px" type="text"
+                    class="form-control form-control-sm"  id="dep_sb_ac_no">
+                </div>
+    
+                <div class="form-group col-3">
+                  <br>
+                  <label class="form-check-label">
+                    <input
+                      [disabled]='disableAll || newtm_deposit.intt_trf_type == undefined || newtm_deposit.intt_trf_type == null || newtm_deposit.intt_trf_type == "O"'
+                      type="checkbox" value="false" [checked]="newtm_deposit.cheque_facility_flag == 'Y'"
+                      (change)="newtm_deposit.cheque_facility_flag = $event.target.checked ? 'Y' : 'N' "><small> Standing
+                      Instr</small>
+                  </label>
+                </div>
+    
+              </div>
+            </div>
+        </div>
+
+      </div> -->
+    </div>
+     
+     
+     <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+      <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+      <span class="alert-text">{{ showMsg.Message }}</span>
+    </div>
+
+  </div>
+
+
+
+  <!-- <div
+    class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="newAccount()">New</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieveData()">Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="modifyData()">Modify</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="clearData()">Clear</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="saveData('N')">Save</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" (click)="backScreen()">Back</button>
+    <button mat-raised-button type="button" class="btn btn-primary btn-sm ml-1 mr-1" >Delete</button>
+    <button mat-raised-button type="button" [disabled]="!kycEnable" class="btn btn-primary btn-sm ml-1 mr-1"
+      (click)="openModal(kycContent)">Kyc</button>
+   
+  </div> -->
+  <ng-container *ngTemplateOutlet="buttonDiv"></ng-container>
+
+
+</div>
+
+
+<ng-template #kycContent>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">KYC Details</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-kyc></app-kyc>
+  </div>
+</ng-template>
+<ng-template #contentLoanStmt let-modal bd-example-modal-xl>
+  <div class="modal-header">
+    <h4 class="modal-title customHeader" id="modal-basic-title">Security <Details></Details></h4>
+  </div>
+  <div class="modal-body ">
+    <div class="col-lg-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+     <h1>hello</h1> 
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Ok</button>
+  </div>
+</ng-template>
+<!-- <ng-template #MakerChecker >
+  <div class="modal-body text-center" >
+    <p>a transaction created by a user cannot be approved by that user.</p>
+   <button mat-raised-button type="button" class=" btn btn-primary" (click)="this.modalRef.hide()" >Close</button>
+    
+  </div>
+</ng-template> -->

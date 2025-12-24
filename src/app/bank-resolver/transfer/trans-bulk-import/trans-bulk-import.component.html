@@ -1,0 +1,141 @@
+
+
+<loading *ngIf="isLoading"></loading>
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 90vh;">
+<!-- <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+  <div>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieve()">Retrieve</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="GetUnapproveTransfer()">RetrieveBatch</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="save()">Save</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="clear()">Clear</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"   (click)="delete()">Delete</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="closeScreen()" style="position: absolute;right: 10px;">Close</button>
+ </div>
+</div> -->
+     
+<div class="container">
+  <div class="card">
+    
+    <div class="header">
+      <h1>Bulk Upload</h1>
+      <p>Have you no sample file? Please click on <b style="color: rgb(0, 0, 155);cursor: pointer;" (click)="downloadSample()">DOWNLOAD</b></p>
+    </div>
+
+    <div class="upload-section">
+      <label for="file-upload" class="btn btn-primary">
+        <span>Select CSV / XLSX File</span>
+        <input id="file-upload" name="file-upload" type="file" class="sr-only" accept=".csv,.xlsx,.xls" (change)="onFileChange($event)">
+      </label>
+       <!-- <button (click)="insertBulk()"
+        class="btn btn-convert">
+        Save  
+      </button>&nbsp; -->
+      <span class="file-name">
+        <ng-container *ngIf="fileName ; else noFileSelected">
+          {{ fileName  }}
+        </ng-container>
+        <ng-template #noFileSelected>
+          No file selected
+        </ng-template>
+      </span>
+      <button (click)="getDataForView()"
+        class="btn btn-convert">
+        Retrive  
+      </button>
+     
+      <button (click)="approveTrnsData()"
+        class="btn btn-convert"
+         [disabled]="approveDisable">
+         Approve 
+      </button>
+      
+    </div>
+     <!-- (click)="convertCsvToJson()"  -->
+    <!-- <div class="error-message" role="alert" *ngIf="errorMessage()">
+      <strong>Oops!</strong>
+      <span>{{ errorMessage() }}</span>
+    </div> -->
+
+    <div class="results-section" *ngIf="jsonDataView.length>0">
+      <h2></h2>
+      <div class="table-container">
+        <table>
+          <thead> 
+          <tr>
+          <th class="text-center">Sl No</th>
+          <th class="text-center">Brn Code</th>
+          <th class="text-center">Trans Type</th>
+          <th class="text-center">Acc Type CD</th>
+          <th class="text-center">Account No</th>
+          <th class="text-end">Amount</th>
+          <th>ACC CD</th>
+          <th>Narration</th>
+          <th>Trans Date</th>
+          <th>Acc Num Status</th>
+          <th>Balance Status</th>
+          <th>GL Status</th>
+          <!-- <th>Created By</th> -->
+          </tr>
+          </thead>
+        <tbody>
+          <tr *ngFor="let row of jsonDataView">
+            <td class="text-center">{{ row.sl_no }}</td>
+            <td class="text-center">{{ row.brn_cd }}</td>
+            <td class="text-center">{{ row.trans_type }}</td>
+            <td class="text-center">{{ row.acc_type_cd }}</td>
+            <td class="text-center">{{ row.acc_num }}</td>
+            <td class="text-end">{{ row.amount | number:'1.2-2' }}</td>
+            <td>{{ row.acc_cd }}</td>
+            <td>{{ row.narration }}</td>
+            <td>{{ row.trans_dt ? (row.trans_dt | date:'dd/MM/yyyy') : '' }}</td>
+            <td [ngClass]="row.acc_num_flag === 'Y' ? 'green' : 'red'">{{ checkFlag(row.acc_num_flag) }}</td>
+            <td [ngClass]="row.balance_flag === 'Y' ? 'green' : 'red'" >{{ checkFlag(row.balance_flag)}}</td>
+            <td [ngClass]="row.gl_flag === 'Y' ? 'green' : 'red'">{{ checkFlag(row.gl_flag)}}</td>
+            <!-- <td>{{ row.created_by }}</td> -->
+          </tr>
+          <!-- total row -->
+          <tr class="fw-bold">
+            <td colspan="3" class="text-end">Data Imported By: {{jsonDataView[0]?.created_by}}</td>
+            <td colspan="3" class="text-end">Total Deposit: {{ totalDepAmount | number:'1.2-2' }}</td>
+            <td colspan="3" class="text-end">Total Withdrawl: {{ totalWthAmount | number:'1.2-2' }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+      <div style="text-align: center;padding: 10px;">
+         <button 
+          class="btn btn-convert"
+          (click)="clear()" >
+          Clear 
+        </button>&nbsp;&nbsp;&nbsp;
+        <button 
+          class="btn btn-convert"
+          (click)="closeScreen()" >
+          Back 
+        </button>
+      </div>
+  </div>
+</div>
+
+<!-- <div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 shadow mb-2 bg-white p-3 d-flex justify-content-center align-items-center">
+  <div>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1" (click)="retrieve()">Retrieve</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="GetUnapproveTransfer()">RetrieveBatch</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="save()">Save</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="clear()">Clear</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"   (click)="delete()">Delete</button>
+    <button mat-raised-button type="button"  class="btn btn-primary btn-sm ml-1 mr-1"  (click)="closeScreen()" style="position: absolute;right: 10px;">Close</button>
+ </div>
+</div> -->
+  </div>
+  <div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+      <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+      <span class="alert-text">{{ showMsg.Message }}</span>
+      <button  type="button" class="close" data-dismiss="alert" (click)="showMsg.Show = null" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+ 

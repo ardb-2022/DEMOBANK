@@ -1,0 +1,32 @@
+@media print{
+    #fastPagePuri{
+        page-break-after: avoid!important;
+        page-break-before: avoid!important;
+        font-size:x-large!important;
+        
+    }
+    
+    #fastPagePuri,p{font-weight: 600!important;}
+}
+#fastPagePuri{
+    font-weight: 600!important;
+}b{
+    font-size:x-large!important;
+    
+}
+@media print{
+    #fastPageRDPuri{
+        page-break-after: avoid!important;
+        page-break-before: avoid!important;
+        font-size:large!important;
+        
+    }
+    
+    #fastPageRDPuri,p{font-weight: 600!important;}
+}
+#fastPageRDPuri{
+    font-weight: 600!important;
+}b{
+    font-size:large!important;
+    
+}

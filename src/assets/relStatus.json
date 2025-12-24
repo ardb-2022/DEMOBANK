@@ -1,0 +1,12 @@
+[
+    { "id": 1, "val": "FATHER" },
+    { "id": 2, "val": "MOTHERr" },
+    { "id": 3, "val": "SISTER" },
+    { "id": 4, "val": "BROTHER" },
+    { "id": 5, "val": "FRIEND" },
+    { "id": 6, "val": "SON" },
+    { "id": 7, "val": "DAUGHTER" },
+    {"id":8 ,"val":"WIFE"},
+    {"id":9 ,"val":"HUSBAND"},
+    { "id": 10, "val": "OTHERS" }
+]

@@ -1,0 +1,247 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <span [hidden]="!notvalidate" style="color:red;">{{date_msg}}</span>
+        <!-- <div class="form-row">
+           <div class="form-group col-12" style="margin-bottom: 0%;">
+          <small for="agent_cd">Search Agent.. </small>
+          <input type="text" class="form-control form-control-sm"
+          formControlName="agent_cd"   (keyup)="onshow($event)" placeholder="Search by agent name or code..">
+          
+        </div>
+        <ng-container>
+          <div class="suggestions border p-2 " style="width: 98%; top: 48%; left: 1%;"
+          *ngIf="showHideAgent">
+               
+            <table id="customers1">
+              <tr>
+                <th> Agent Code</th>
+                <th>Agent Name</th>
+              </tr>
+              <tbody *ngFor="let agent of allAgent2" >
+                <tr  (click)="selectAgent(agent)">
+                  <td>
+                    {{agent.agent_cd}}
+                  </td>
+                  <td>
+                    {{agent.agent_name}}
+                  </td>
+                </tr>
+               
+              </tbody>
+              
+            </table>
+            </div>
+        </ng-container>
+        </div> -->
+        <div class="form-row">
+          <div class="col-6">
+            <small for="fromDate" >From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" [readonly]="true" bsDatepicker
+              formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenFromDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <small for="toDate" >To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" [readonly]="true" bsDatepicker
+              formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+              [isOpen]="isOpenToDp">
+            <div class="input-group-append">
+              <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+            </div>
+          </div>
+        </div>
+  
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  
+  <div  class="col-xs-12 col-sm-12 col-md-10 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div style="text-align: center">
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="isRetrieve()" >Retrieve</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Back</button>
+        <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="Delete()" >Delete</button> -->
+        <!-- <button  mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [disabled]="afterPost" (click)="PostIntt()" >Post Commission</button> -->
+        <button mat-raised-button type="button" 
+        class="btn btn-rounded btn-primary m-1" 
+        [useExistingCss]="true"
+        printSectionId="mattable" 
+        ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+
+    </div>
+    </div>
+    <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div *ngIf="showAlert2" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  <div class="col-xs-12 col-sm-10 shadow-lg mb-4 bg-white p-3 mkScroll">
+    
+    <div class="filter-container">
+    <label><strong>Select Agent:</strong></label>
+    <select [(ngModel)]="selectedAgent" (change)="applyFilter()">
+      <option value="ALL">All Agents</option>
+      <option *ngFor="let agent of allAgent" [value]="agent.agent_cd">
+        {{ agent.agent_cd }}-{{ agent.agent_name }}
+      </option>
+    </select>
+  </div>
+   
+  <div class="mat-elevation-z8" id="mattable">
+    <h4 style="text-align:center;">{{ardbName}} ({{branchName}})</h4>
+    <h4 style="text-align:center;">Run Date & Time : {{today}} </h4>
+    <h4 style="text-align:center;"><u>Agent collection from {{reportcriteria.controls.fromDate.value?.toDateString() | date: 'dd/MM/yyyy'}} to {{ this.reportcriteria.controls.toDate.value?.toDateString() | date: 'dd/MM/yyyy'}}</u></h4><br>
+    
+    <div *ngFor="let agent of filteredData" class="agent-section">
+    <h4 class="agent-header">Agent: {{ agent.agentName }} </h4>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Agent CD</th>
+          <th>DDS Account No</th>
+          <th>Loan ID</th>
+          <th>Customer Name</th>
+          <th class="text-right">Opening Balance</th>
+          <th class="text-right">Collection</th>
+          <th class="text-right">Withdrawl</th>
+          <th class="text-right">Loan Collection</th>
+          <th class="text-right">Loan Balance</th>
+          <th class="text-right">Close Balance (Calc)</th>
+          <th class="text-right">Close Balance (Actual)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of agent.rows;let i=index">
+          <td>{{ i+1 }}</td>
+          <td>{{ row.agent_cd }}</td>
+          <td>{{ row.dds_acc_num }}</td>
+          <td>{{ row.loan_id }}</td>
+          <td>{{ row.cust_name }}</td>
+          <td class="text-right">{{ row.open_bal | number:'1.2-2' }}</td>
+          <td class="text-right">{{ row.coll_bal | number:'1.2-2' }}</td>
+          <td class="text-right">{{ row.withdrawl_bal | number:'1.2-2' }}</td>
+          <td class="text-right">{{ row.loan_collection | number:'1.2-2' }}</td>
+          <td class="text-right">{{ row.loan_balance | number:'1.2-2' }}</td>
+          <td class="text-right">{{ row.close_bal_calc | number:'1.2-2' }}</td>
+          <td class="text-right">{{ row.close_bal_actual | number:'1.2-2' }}</td>
+        </tr>
+
+        <!-- Agent Total Row -->
+        <tr class="agent-total">
+          <td colspan="5" class="text-right"><strong>Total ({{ agent.agentName }})</strong></td>
+          <td class="text-right"><strong>{{ agent.totals.open_bal | number:'1.2-2' }}</strong></td>
+          <td class="text-right"><strong>{{ agent.totals.coll_bal | number:'1.2-2' }}</strong></td>
+          <td class="text-right"><strong>{{ agent.totals.withdrawl_bal | number:'1.2-2' }}</strong></td>
+          <td class="text-right"><strong>{{ agent.totals.loan_collection | number:'1.2-2' }}</strong></td>
+          <td class="text-right"><strong>{{ agent.totals.loan_balance | number:'1.2-2' }}</strong></td>
+          <td class="text-right"><strong>{{ agent.totals.close_bal_calc | number:'1.2-2' }}</strong></td>
+          <td class="text-right"><strong>{{ agent.totals.close_bal_actual | number:'1.2-2' }}</strong></td>
+        </tr>
+        <tr>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- GRAND TOTAL -->
+  <table class="report-table grand-total" *ngIf="filteredData.length > 0" class="report-table grand-total">
+    <tr>
+      <td colspan="5" class="text-right"><strong>GRAND TOTAL</strong></td>
+      <td class="text-right"><strong>{{ grandTotal.open_bal | number:'1.2-2' }}</strong></td>
+      <td class="text-right"><strong>{{ grandTotal.coll_bal | number:'1.2-2' }}</strong></td>
+      <td class="text-right"><strong>{{ grandTotal.withdrawl_bal | number:'1.2-2' }}</strong></td>
+      <td class="text-right"><strong>{{ grandTotal.loan_collection | number:'1.2-2' }}</strong></td>
+      <td class="text-right"><strong>{{ grandTotal.loan_balance | number:'1.2-2' }}</strong></td>
+      <td class="text-right"><strong>{{ grandTotal.close_bal_calc | number:'1.2-2' }}</strong></td>
+      <td class="text-right"><strong>{{ grandTotal.close_bal_actual | number:'1.2-2' }}</strong></td>
+    </tr>
+  </table>
+  
+    
+  
+  </div>
+ 
+   <!-- <pagination style="float:right;"
+  [totalItems]="reportData?.length"  
+  [itemsPerPage]="itemsPerPage"
+  [boundaryLinks]="true"
+  [directionLinks]="true"
+  [maxSize]="5"
+  [(ngModel)]="currentPage"
+  name="currentPage"
+  (pageChanged)="pageChanged($event)"
+  (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+   
+  
+  </div>
+  <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Error! </strong> {{alertMsg}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div *ngIf="showAlert2" class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>Success!! </strong> {{alertMsg}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div  class="col-xs-12 col-sm-12 col-md-10 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div style="text-align: center">
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="isRetrieve()" >Retrieve</button>
+    <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Back</button>
+   <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="Delete()" >Delete</button> -->
+   <!-- <button  mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [disabled]="afterPost" (click)="PostIntt()" >Post Commission</button> -->
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+   ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  </div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

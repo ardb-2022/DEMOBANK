@@ -1,0 +1,420 @@
+<loading *ngIf="isLoading"></loading>
+<div class="cheque-issue-container">
+  <div class="header">
+    <h1>
+      <i class="icon-bank"></i>
+      Cheque Issue Management System
+    </h1>
+  </div>
+
+  <div class="main-content">
+    <!-- Left Panel - Form Section -->
+    <div class="form-section">
+      <div class="form-header">
+        <h2>
+          <i class="icon-form"></i>
+          Cheque Issue Details
+        </h2>
+        <div class="mode-indicator" *ngIf="isNewMode" class="new-mode">
+          <span class="badge badge-new">NEW MODE</span>
+        </div>
+      </div>
+
+      <form [formGroup]="chequeForm" class="cheque-form" novalidate>
+        <!-- Account Type -->
+        <div class="form-group">
+          <label for="acc_type_cd" class="form-label">
+            <i class="icon-type"></i>
+            Account Type *
+          </label>
+          <select formControlName="acc_type_cd" 
+                  id="acc_type_cd" 
+                  class="form-control"
+                  [class.error]="isFieldInvalid('acc_type_cd')">
+            <option value="" disabled>Select Account Type</option>
+            <option *ngFor="let type of accountTypes" [value]="type.code">
+              {{ type.name }}
+            </option>
+          </select>
+          <div class="error-message" *ngIf="isFieldInvalid('acc_type_cd')">
+            <i class="icon-error"></i>
+            {{ getFieldError('acc_type_cd') }}
+          </div>
+        </div>
+
+        <!-- Account Number & Cheque Book Number -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="acc_num" class="form-label">
+              <i class="icon-account"></i>
+              Account Number *
+            </label>
+            <input type="text" 
+                   formControlName="acc_num" 
+                   id="acc_num"
+                   class="form-control"
+                   (change)="getAccHolderName()"
+                   [class.error]="isFieldInvalid('acc_num')"
+                   placeholder="Enter account number">
+            <div class="error-message" *ngIf="isFieldInvalid('acc_num')">
+              <i class="icon-error"></i>
+              {{ getFieldError('acc_num') }}
+            </div>
+          </div>
+
+           <div class="form-group">
+            <label for="name" class="form-label">
+              <i class="icon-account"></i>
+              Account Holder Name
+            </label>
+            <input type="text" 
+                   formControlName="acc_name" 
+                   id="acc_name"
+                   class="form-control"
+                   [readOnly]="true"
+                   placeholder="Account Holder Name">
+           
+          </div>
+        </div>
+        <div class="form-row">   
+          <div class="form-group">
+            <label for="chq_bk_no" class="form-label">
+              <i class="icon-book"></i>
+              Cheque Book No *
+            </label>
+            <input type="text" 
+                  
+                   formControlName="chq_bk_no" 
+                   id="chq_bk_no"
+                   class="form-control"
+                   [class.error]="isFieldInvalid('chq_bk_no')"
+                   placeholder="Book number">
+            <div class="error-message" *ngIf="isFieldInvalid('chq_bk_no')">
+              <i class="icon-error"></i>
+              {{ getFieldError('chq_bk_no') }}
+            </div>
+          </div>
+          <div class="form-group">
+          <label for="issue_dt" class="form-label">
+            <i class="icon-calendar"></i>
+            Issue Date *
+          </label>
+          <input type="date" 
+                 formControlName="issue_dt" 
+                 id="issue_dt"
+                 class="form-control"
+                 [class.error]="isFieldInvalid('issue_dt')">
+          <div class="error-message" *ngIf="isFieldInvalid('issue_dt')">
+            <i class="icon-error"></i>
+            {{ getFieldError('issue_dt') }}
+          </div>
+        </div>
+        </div>
+
+        <!-- Issue Date -->
+        <!-- <div class="form-group">
+          <label for="issue_dt" class="form-label">
+            <i class="icon-calendar"></i>
+            Issue Date *
+          </label>
+          <input type="date" 
+                 formControlName="issue_dt" 
+                 id="issue_dt"
+                 class="form-control"
+                 [class.error]="isFieldInvalid('issue_dt')">
+          <div class="error-message" *ngIf="isFieldInvalid('issue_dt')">
+            <i class="icon-error"></i>
+            {{ getFieldError('issue_dt') }}
+          </div>
+        </div> -->
+
+        <!-- Cheque Number Range -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="chq_no_from" class="form-label">
+              <i class="icon-number"></i>
+              Cheque No From *
+            </label>
+            <input type="text" 
+                   formControlName="chq_no_from" 
+                   id="chq_no_from"
+                   class="form-control"
+                   [class.error]="isFieldInvalid('chq_no_from')"
+                   placeholder="000000"
+                   maxlength="6">
+            <div class="error-message" *ngIf="isFieldInvalid('chq_no_from')">
+              <i class="icon-error"></i>
+              {{ getFieldError('chq_no_from') }}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="chq_no_to" class="form-label">
+              <i class="icon-number"></i>
+              Cheque No To *
+            </label>
+            <input type="text" 
+                   formControlName="chq_no_to" 
+                   id="chq_no_to"
+                   class="form-control"
+                   [class.error]="isFieldInvalid('chq_no_to')"
+                   placeholder="000000"
+                   maxlength="6">
+            <div class="error-message" *ngIf="isFieldInvalid('chq_no_to')">
+              <i class="icon-error"></i>
+              {{ getFieldError('chq_no_to') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Cheque Version & Approval Status -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="chq_version" class="form-label">
+              <i class="icon-version"></i>
+              Cheque Version *
+            </label>
+            <select formControlName="chq_version" 
+                    id="chq_version" 
+                    class="form-control"
+                    [class.error]="isFieldInvalid('chq_version')">
+              <option value="1">Version 1 (Old)</option>
+              <option value="2">Version 2 (New)</option>
+              <!-- <option value="4">Version 4 (New)</option> -->
+            </select>
+            <div class="error-message" *ngIf="isFieldInvalid('chq_version')">
+              <i class="icon-error"></i>
+              {{ getFieldError('chq_version') }}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="approval_status" class="form-label">
+              <i class="icon-status"></i>
+              Approval Status
+            </label>
+            <select formControlName="approval_status" 
+                    id="approval_status" 
+                    class="form-control status-field"
+                    [class.error]="isFieldInvalid('approval_status')">
+              <option value="U">Un-Approved</option>
+              <option value="A">Approved</option>
+              <option value="R">Rejected</option>
+            </select>
+            <div class="status-indicator" 
+                 [ngClass]="{
+                   'status-pending': chequeForm.get('approval_status')?.value === 'U',
+                   'status-approved': chequeForm.get('approval_status')?.value === 'A',
+                   'status-rejected': chequeForm.get('approval_status')?.value === 'R'
+                 }">
+            </div>
+          </div>
+        </div>
+
+        <!-- Created By & Approved By -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="created_by" class="form-label">
+              <i class="icon-user"></i>
+              Created By *
+            </label>
+            <input type="text" 
+                   formControlName="created_by" 
+                   id="created_by"
+                   class="form-control"
+                   [class.error]="isFieldInvalid('created_by')"
+                   placeholder="User ID">
+            <div class="error-message" *ngIf="isFieldInvalid('created_by')">
+              <i class="icon-error"></i>
+              {{ getFieldError('created_by') }}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="approved_by" class="form-label">
+              <i class="icon-approved"></i>
+              Approved By
+            </label>
+            <input type="text" 
+                   formControlName="approved_by" 
+                   id="approved_by"
+                   class="form-control"
+                   placeholder="Approver ID"
+                   readonly>
+            <small class="field-note">Auto-filled on approval</small>
+          </div>
+        </div>
+
+        <!-- Audit Information Panel -->
+        <div class="audit-panel" *ngIf="chequeBook?.approval_status=='A'">
+          <h4><i class="icon-audit"></i> Audit Information</h4>
+          <div class="audit-grid">
+            <div class="audit-item">
+              <label>Created Date:</label>
+              <span>{{ chequeBook.created_dt.toString().substr(0,10)}}</span>
+            </div>
+            <div class="audit-item" *ngIf="chequeBook.approved_dt">
+              <label>Approved Date:</label>
+              <span>{{ chequeBook.approved_dt.toString().substr(0,10)}}</span>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Account Information Table -->
+      <div class="accounts-section">
+        <div class="section-header">
+          <h3><i class="icon-accounts"></i> Account Information</h3>
+        </div>
+        <div class="accounts-table">
+          <div class="table-header">
+            <div class="col-type">Type</div>
+            <div class="col-number">Account No</div>
+            <div class="col-date">Issue Date</div>
+            <div class="col-from">From</div>
+            <div class="col-to">To</div>
+            <div class="col-name">Name</div>
+          </div>
+          <!-- (click)="selectAccount(account.acc_num)" -->
+          <div class="table-body">
+            <div class="account-row" 
+                 *ngFor="let account of accounts"
+                 [class.selected]="selectedAccount === account.acc_num"
+                 (click)="selectAccount(account)">
+              <div class="col-type">{{ getAccountTypeName(account.acc_type_cd) }}</div>
+              <div class="col-number">{{ account.acc_num }}</div>
+              <div class="col-date">{{ account.issue_dt }}</div>
+              <div class="col-from">{{ account.chq_no_from }}</div>
+              <div class="col-to">{{ account.chq_no_to }}</div>
+              <div class="col-name">{{ account.acc_name }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Cheque Details -->
+    <div class="cheque-details-section">
+      <div class="section-header">
+        <h3>
+          <i class="icon-cheque"></i> 
+          Cheque Details
+          <span class="cheque-count" *ngIf="cheques.length > 0">
+            ({{ cheques.length }} cheques)
+          </span>
+        </h3>
+        <div class="cheque-summary" *ngIf="cheques.length > 0">
+          <span class="summary-item fresh">
+            <i class="icon-fresh"></i>
+            Fresh: {{ freshCheques.length }}
+          </span>
+          <span class="summary-item used">
+            <i class="icon-used"></i>
+            Used: {{ usedCheques.length }}
+          </span>
+        </div>
+      </div>
+<!-- (click)="toggleChequeStatus(cheque.no)" -->
+      <div class="cheque-grid-container" *ngIf="cheques.length > 0; else noCheques">
+        <div class="cheque-grid">
+          <div class="cheque-item" 
+               *ngFor="let cheque of cheques; "
+               [class]="'cheque-item cheque-' + cheque.chq_status"
+               
+               [class.clickable]="isModifyMode">
+            <div class="cheque-number">{{ cheque.chq_no }}</div>
+            <div class="cheque-status">
+              <span class="status-badge" [class]="'status-' + cheque.chq_status">
+                <i [class]="cheque.chq_status === 'I' ? 'icon-fresh' : 'icon-used'"></i>
+                {{ cheque.chq_status=="I"?'Fresh':'Used' | titlecase }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noCheques>
+        <div class="no-cheques">
+          <i class="icon-empty"></i>
+          <p>No cheques available</p>
+          <p class="sub-text">Select an account to view cheque details</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button type="button" 
+            class="btn btn-new" 
+            (click)="handleAction('new')"
+            >
+      <i class="icon-plus"></i>
+      <span>New</span>
+    </button>
+    
+    <!-- <button type="button" 
+            class="btn btn-retrieve" 
+            (click)="handleAction('retrieve')"
+            [disabled]="isModifyMode || isNewMode">
+      <i class="icon-search"></i>
+      <span>Retrieve</span>
+    </button> -->
+    
+    <!-- <button type="button" 
+            class="btn btn-modify" 
+            (click)="handleAction('modify')"
+            [disabled]="!canModify">
+      <i class="icon-edit"></i>
+      <span>Modify</span>
+    </button> -->
+    <!-- [disabled]="!canSave" -->
+    <button type="button" 
+            class="btn btn-save" 
+            (click)="handleAction('save')" 
+            [disabled]="!isNewMode"
+            [class.loading]="false">
+      <i class="icon-save"></i>
+      <span>Save</span>
+    </button>
+    
+    <button type="button" 
+            class="btn btn-approve" 
+            (click)="handleAction('approve')"
+            [disabled]="!canApprove">
+      <i class="icon-check"></i>
+      <span>Approve</span>
+    </button>
+    
+    <button type="button" 
+            class="btn btn-back" 
+            (click)="handleAction('back')">
+      <i class="icon-back"></i>
+      <span>Back</span>
+    </button>
+    
+    <button type="button" 
+            class="btn btn-delete" 
+            (click)="handleAction('new')"
+            >
+      <i class="icon-trash"></i>
+      <span>Clear</span>
+    </button>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="false">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Processing...</p>
+    </div>
+  </div>
+</div>
+ 
+<div *ngIf="showMsg?.Show" class="custom-alert-popup animate-popup" [ngClass]="getAlertClass(showMsg.Type)">
+          <span class="alert-icon">{{ getAlertIcon(showMsg.Type) }}</span>
+          <span class="alert-text">{{ showMsg.Message }}</span>
+          <button  type="button" class="close" data-dismiss="alert" (click)="showMsg = null" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+          </button>
+    </div>

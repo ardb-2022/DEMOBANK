@@ -1,0 +1,214 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error! </strong> {{alertMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div class="form-row">
+          <div class="form-group col-3">
+            <small for="acc_type_cd"><i class="fa fa-star text-danger" aria-hidden="true"></i> Account Type</small>
+            <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
+              (change)="onAccountTypeChange()">
+              <option *ngIf="AcctTypes2" disabled>Choose</option>
+              <option *ngFor="let acctType of AcctTypes2" [value]="acctType.acc_type_cd">
+                {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+              </option>
+
+            </select>
+          </div>
+          <div class="col-9">
+            <small for="acct_num"> <i class="fa fa-star text-danger" aria-hidden="true"></i> Search Name/Cust
+              code/Phone</small>
+            <div class="input-group">
+              <input type="text" class="form-control form-control-sm " formControlName="acct_num" id="acct_num"
+                placeholder="Enter Acc# / Customer Name / Phone number" (input)="onChangeNull()" name="x-field-1"
+                autocomplete="new-field-1">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-primary btn-sm" [disabled]="disabledOnNull" (click)="suggestCustomer()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+  
+            <div class="suggestions" *ngIf="suggestedCustomer && suggestedCustomer.length > 0">
+              <table class="table table-hover table-bordered table-sm w-auto small">
+                <thead>
+                  <tr>
+                    <th scope="col">Acc#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Guardian Name</th>
+                    <th scope="col">Address</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cust of suggestedCustomer" (click)="SelectCustomer(cust)">
+                    <td scope="row">{{cust.acc_num}}</td>
+                    <td>{{cust.cust_name}}</td>
+                    <td>{{((null === cust.phone) ? '' : cust.phone)}}</td>
+                    <td>{{cust.guardian_name}}</td>
+                    <td>{{cust.present_address}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="suggestions border p-2" style="width: 150%; font-size: small;"
+              *ngIf="suggestedCustomer && !(suggestedCustomer.length > 0)">
+              <strong class="text-danger">" {{this.reportcriteria.controls.acct_num.value}} " does not match with any
+                customer</strong>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="showWait"><b>Please wait...</b></div>
+          <!-- <div class="col-6">
+            <small for="fromDate"><i class="fa fa-star text-danger" aria-hidden="true"></i> From Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+                formControlName="fromDate"
+                [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }" [isOpen]="isOpenFromDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div> -->
+          <!-- <div class="col-6">
+            <small for="toDate"><i class="fa fa-star text-danger" aria-hidden="true"></i> To Date</small>
+            <div class="input-group">
+              <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="toDate" disabled bsDatepicker
+                formControlName="toDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+                [isOpen]="isOpenToDp">
+              <div class="input-group-append">
+                <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenToDp = !isOpenToDp">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div> -->
+        </div>
+  
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+    style="background-color: #78c2ad21; min-height: 20vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [disabled]="disablePrint" [useExistingCss]="true"
+          printSectionId="hiddenTab" ngxPrint (click)="printCall()">Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <!-- <button mat-raised-button type="button" (click)="FastpageScreen()" class="btn btn-rounded btn-primary m-1"[routerLink]="['DR_PassBookFastPage']" >Print Fast Page</button> -->
+  
+      </div>
+    </div>
+    <div *ngIf="showAlert" class="alert alert-success alert-dismissible fade show" role="alert" style="width: 67%;">
+      <strong>Msg,</strong> {{alertMsg}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+     <div id="hiddenTab">
+      
+        <div class="page" *ngIf="this.tm_deposit.acc_num">
+          <!-- Left Certificate (30%) -->
+          <div class="certificate-left">
+            <h6>Established 2007</h6>
+            <h4>PURI URBAN AND RURAL<br>DEVELOPMENT CO-OP. SCTY. LTD.</h4>
+            <div style="text-align: center;">
+              <p>Registered under O.C.S Act-1962</p>
+            <p>Regn No.: 193/54/Puri</p>
+            <p>Dated: 07/12/2003</p>
+            <p>Regd. Office: D.R.C.S., Puri (Odisha)</p>
+            </div>
+            
+            <div class="section-title">SHARE CERTIFICATE</div>
+            <p><strong>Share No.:</strong> {{this.tm_deposit.acc_num}}</p>
+            <p>This is to certify that <strong>{{this.cName}}</strong> is the registered holder of share/shares of RUPEES HUNDRED each in this society subject to the provisions of the rules and article of association of this society upon which payments have been received as noted below.</p>
+            <p><strong>Date Of Payment:</strong> {{openingDT}}</p>
+            <p><strong>Amount Rs.:</strong> {{shareAmt}}</p>
+            <p>Given under the Common Seal of the Society</p><br><br>
+            <div class="footer">
+              <div>Acct.</div>
+              <div>Chief Executive</div>
+            </div>
+            <div class="issue-date"><strong>Issue Date:</strong> {{issuDate}}</div>
+          </div>
+
+          <!-- Right Certificate (70%) -->
+          <div class="certificate-right">
+            <h6>Established 2007</h6>
+            <h4>PURI URBAN AND RURAL<br>DEVELOPMENT CO-OP. SOCIETY LTD.</h4>
+            <div style="text-align: center;">
+                <p>Registered under O.C.S Act-1962</p>
+                <p>Regn No.: 193/54/Puri</p>
+                <p>Dated: 07/12/2003</p>
+                <p>Regd. Office: D.R.C.S., Puri (Orissa)</p>
+            </div>
+            <div class="section-title">SHARE CERTIFICATE</div>
+            <p><strong>Share No.:</strong>  {{this.tm_deposit.acc_num}}</p>
+            <p>This is to certify that <strong>{{this.cName}}</strong> is the registered holder of share/shares of RUPEES HUNDRED each in this society subject to the provisions of the rules and article of association of this society upon which payments have been received as noted below.</p>
+            <p><strong>Date Of Payment:</strong> {{openingDT}}</p>
+            <p><strong>Amount:</strong> {{shareAmt}}</p>
+            <p>Given under the Common Seal of the Society</p>
+            <div class="footer"><br><br>
+              <div>Accountant</div>
+              <div>Chief Executive</div>
+            </div>
+            <div class="issue-date"><strong>Issue Date:</strong> {{issuDate}}</div>
+          </div>
+        </div>
+        </div>
+       
+    </div>
+  
+  
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+      <div>
+        <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()">Close</button>
+        <button #print mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" [disabled]="disablePrint" [useExistingCss]="true"
+        printSectionId="hiddenTab" ngxPrint (click)="printCall()">Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+   <!-- <button mat-raised-button type="button" (click)="FastpageScreen()" class="btn btn-rounded btn-primary m-1"[routerLink]="['DR_PassBookFastPage']" >Print Fast Page</button> -->
+  
+      </div>
+    </div>
+  </div>
+  <ng-template #UpdateSuccess let-modal data-keyboard="false" data-backdrop="false">
+   
+    <div class="modal-body">
+      <h4 style="color: darkgreen;"><b>{{cName}}</b> {{Header}} Print successfully....</h4>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  <ng-template #alreadyUpdate let-modal data-keyboard="false" data-backdrop="false">
+   
+    <div class="modal-body">
+      <h4 style="color: rgb(146, 8, 8);"><b>{{cName}}</b> Certificate Already Printed</h4>
+    </div>
+    <div class="modal-footer">
+      <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <loading *ngIf="isLoading"></loading>
+  
+  

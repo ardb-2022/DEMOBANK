@@ -1,0 +1,85 @@
+
+.mkScroll{
+    height: auto;
+    max-width: 95%;
+    max-height: 500px;
+    overflow: auto;
+}
+.notice-container {
+  width: 80%;
+  margin: auto;
+  font-family: 'Verdana', serif;
+  line-height: 1.6;
+  /* border: 1px solid #000; */
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.customer-info, .letter-body, .notice-text, .memo {
+  margin-bottom: 20px;
+}
+
+.loan-summary table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+}
+
+.loan-summary th, .loan-summary td {
+  border: 1px solid #000;
+  padding: 6px;
+  text-align: center;
+}
+
+.footer-top {
+  text-align: right;
+  margin-top: 30px;
+}
+
+.memo {
+  font-size: 14px;
+}
+
+ #customers1 {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 60%;
+    font-size: small;
+  }
+  
+  #customers1 td, #customers1 th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    
+  }
+  
+  #customers1 tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #customers1 tr:hover {background-color: #a7d1d1; cursor: pointer;}
+  
+  #customers1 th {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: left;
+    background-color: #286e6e;
+    color: white;
+    font-size:small
+  }
+.suggestions{
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    z-index: 5;
+    width: 600px;
+    height: auto;
+    max-height: 300px;
+    overflow: auto;
+  }
+
+  @media print {
+  tfoot { display: table-row-group; } /* avoid repetition */
+  .total-row { break-inside: avoid; }
+}

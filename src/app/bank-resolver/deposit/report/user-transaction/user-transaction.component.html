@@ -1,0 +1,290 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+        <div>
+          <label for="fromDate">As on</label>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div  class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll" style="text-align: center;">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+     printSectionId="mattable" 
+     ngxPrint>Print</button>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()" >Download Excel</button>
+    
+    </div>
+    </div> 
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+    
+   <!-- <mat-form-field class="search" appearance="outline">
+    
+    <mat-label style="height:30px;">
+      Search Sub cash Book</mat-label>
+    <input matInput  (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+  </mat-form-field> -->
+  
+  <div class="mat-elevation-z8" >
+   
+
+    <div class="flex gap-4 mb-3">
+        <!-- Branch dropdown -->
+        <select [(ngModel)]="selectedBranch" (change)="applyFilter()" class="border rounded p-1">
+          <option value="">All Branches</option>
+          <option *ngFor="let b of branchMaster" [value]="b.brn_cd">{{ b.brn_name }}</option>
+        </select>
+
+        <!-- Global Search -->
+        <input type="text"
+              [(ngModel)]="globalSearch"
+              (input)="applyFilter()"
+              class="border rounded p-1 flex-1"
+              placeholder="Search anything..."/>
+      </div>
+  <div id="mattable">
+      <div style="text-align:center; font-weight:bold;">
+    PURI URBAN & RURAL DEVELOPMENT CO-OPERATIVE SOCIETY LTD.<br>
+    BRANCH : {{branchName}}<br>
+    RUN DATE : {{ today | date:'dd/MM/yyyy' }}
+  </div>
+
+    <h4 style="text-align:center; margin-top: 10px;">
+      Userwise Transaction Details
+    </h4>
+    <div style="text-align:center; font-weight: bold;" *ngIf="transactionDate">
+      Transaction of {{ fromdate?.toString() }}
+    </div>
+    <table border="1" cellspacing="0" cellpadding="5" width="100%" 
+            style="margin-top:10px; border-collapse:collapse; font-size: 13px;">
+            
+        <thead>
+          <tr>
+            <th>Branch Cd</th>
+            <th>Trans Cd</th>
+            <th>Acc Type</th>
+            <th>Acc Name</th>
+            <th>Acc Num</th>
+            <th>Cust Name / Narration</th>
+            <th>Trans Type</th>
+            <th>Mode</th>
+            <th>Receipt</th>
+            <th>Payment</th>
+            <th>Created By</th>
+            <th>Approved By</th>
+            <th>Introducer's A/C Type</th>
+            <th>A/C Num</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of formattedData">
+            <td>{{ row.brnCd }}</td>
+            <td>{{ row.transCd }}</td>
+            <td>{{ row.accTypeCd }}</td>
+            <td>{{ row.accName }}</td>
+            <td>{{ row.accNum }}</td>
+            <td>{{ row.custName }}</td>
+            <td>{{ row.transTypeFull }}</td>
+            <td>{{ row.trfTypeFull }}</td>
+            <td style="text-align:right">{{ row.creditAmount | number:'1.2-2' }}</td>
+            <td style="text-align:right">{{ row.debitAmount | number:'1.2-2' }}</td>
+            <td>{{ row.createdByName }}</td>
+            <td>{{ row.approvedByName }}</td>
+            <td>{{ row.intoAccTypeFull }}</td>
+            <td>{{ row.introAccNum }}</td>
+          </tr>
+        </tbody>
+      </table>
+  </div>
+  
+    <footer><small>
+      This report is generated through SynergicBanking
+     </small></footer>
+  </div>
+  <!-- <mat-paginator showFirstLastButtons [pageSizeOptions]="[5, 10, 25, 100, this.reportData.length]" aria-label="Select page of users"></mat-paginator> -->
+  
+  
+   
+   <!-- <pagination style="float:right;"
+  [totalItems]="reportData?.length"  
+  [itemsPerPage]="itemsPerPage"
+  [boundaryLinks]="true"
+  [directionLinks]="true"
+  [maxSize]="5"
+  [(ngModel)]="currentPage"
+  name="currentPage"
+  (pageChanged)="pageChanged($event)"
+  (pageBoundsCorrection)="pageChanged($event)"></pagination> -->
+   <table class="p-3" id="trial" hidden>
+     <tr *ngIf="reportData">
+       <!-- <th></th> -->
+       <th>Acc Type</th>
+       <th>Constitution</th>
+       <th>PRN/INTT</th>
+     
+       <th>A/c No.</th>
+       <th>Customer Name</th>
+       <th colspan="2" style="text-align:center">Debit</th>
+       <th colspan="2" style="text-align:center">Credit</th>
+    </tr>
+    <tr *ngIf="reportData">
+      <!-- <th></th> -->
+      <th colspan="5"></th>
+      
+      <th style="text-align:right">Cash</th>
+      <th style="text-align:right">Transfer</th>
+      <th style="text-align:right">Cash</th>
+      <th style="text-align:right">Transfer</th>
+   </tr>
+     <tbody *ngFor="let i of pagedItems; let itr=index;" >
+      <tr>
+        <td>{{i.acc_type_desc}}</td>
+        <td>{{i.constitution_desc}}</td>
+        <td>{{i.prn_intt_flag}}</td>
+       
+        <td>{{i.acc_num}}</td>
+        <td>{{i.cust_name}}</td>
+        <td style="text-align:right">{{i.cash_dr | number : '1.2-2'}}</td>
+        <td style="text-align:right">{{i.trf_dr | number : '1.2-2'}}</td>
+        <td style="text-align:right">{{i.cash_cr | number : '1.2-2'}}</td>
+        <td style="text-align:right">{{i.trf_cr | number : '1.2-2'}}</td>
+      </tr>
+    
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="8"> <small>
+          This report is generated through SynergicBanking
+         </small> </td>
+      </tr>
+      
+     </tfoot>
+   </table>
+   <div hidden id="hiddenTab">
+    <div class="justify-content-center" style="text-align:center">
+      <h4>{{ardbName}} {{branchName}}</h4>
+  
+      <h4>Run Date & Time : {{today}} </h4> <br>
+      <h4> <u> Sub Cash Book as on {{fromdate.toDateString()| date: 'dd/MM/yyyy'}} </u></h4>
+  
+   </div>
+   <table class="p-3" id="trial1" class="mkSmall">
+  
+   
+    
+   <thead>
+  
+  
+   <tr *ngIf="reportData">
+    <!-- <th></th> -->
+    <th>Acc Type</th>
+    <th>Constitution</th>
+    <th>PRN/INTT</th>
+    
+    <th>A/c No.</th>
+    <th>Customer Name</th>
+    <th colspan="2" style="text-align:center">Debit</th>
+    <th colspan="2" style="text-align:center">Credit</th>
+  </tr>
+  <tr *ngIf="reportData">
+   <!-- <th></th> -->
+   <th colspan="5"></th>
+   
+   <th style="text-align:right">Cash</th>
+   <th style="text-align:right">Transfer</th>
+   <th style="text-align:right">Cash</th>
+   <th style="text-align:right">Transfer</th>
+  </tr>
+  </thead>
+  <tbody *ngFor="let i of reportData; let itr=index;" >
+   <tr>
+    <td>{{i.acc_type_desc}}</td>
+     <td>{{i.constitution_desc}}</td>
+     <td>{{i.prn_intt_flag}}</td>
+     
+     <td>{{i.acc_num}}</td>
+     <td>{{i.cust_name}}</td>
+     <td style="text-align:right">{{i.cash_dr  | number : '1.2-2'}}</td>
+     <td style="text-align:right">{{i.trf_dr | number : '1.2-2'}}</td>
+     <td style="text-align:right">{{i.cash_cr | number : '1.2-2'}}</td>
+     <td style="text-align:right">{{i.trf_cr | number : '1.2-2'}}</td>
+   </tr>
+  
+  </tbody>
+  
+  <tfoot>
+    <tr>
+     <td>&nbsp;</td>
+     <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+     </tr>
+   
+  </tfoot>
+  
+  </table>
+  <footer>
+    <small>
+      This report is generated through SynergicBanking
+     </small> 
+   </footer>
+  <!-- <br><br><br><br>
+  <small>This report is generated through SynergicBanking</small> -->
+   </div>
+   <button mat-raised-button hidden id="chngPage" (click)="setPage(1)"></button>
+  
+  </div>
+  <!-- <img src="../../../../../assets/reportCSS.css" alt=""> -->
+  <div  class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll" style="text-align: center;">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+   ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()" >Download Excel</button>
+  
+  </div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

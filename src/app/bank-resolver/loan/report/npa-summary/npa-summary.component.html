@@ -1,0 +1,477 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form>
+       <div class="form-row">
+           <div class="col-12">
+              <input [(ngModel)]="modelDate" placeholder="Select a Month" autocomplete="off" class="form-control" name="date" bsDatepicker [bsConfig]="{dateInputFormat: 'MM/YYYY'}" (onShown)="onOpenCalendar($event)">
+                <!-- Result: <p>{{modelDate}}</p> -->
+          </div>
+      </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+     printSectionId="mattable" 
+    [printStyle]="{ '@page': { size: 'landscape !important' } }"
+     ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+    
+    </div>
+    </div>
+  <!-- {{ReportUrl}} -->
+  
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll"><br>
+      <mat-accordion>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              General Search
+            </mat-panel-title>
+            <mat-panel-description>
+              Click here to search any field
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <div class="row">
+            <div class="col-12">
+              <mat-form-field appearance="outline" style="width:100%">
+                <mat-label>Search Demand List</mat-label>
+                <input matInput id="myInput" (keyup)="applyFilter0($event)" placeholder="Ex. abc / 123">
+              </mat-form-field> &nbsp;
+             </div>
+          </div>
+        </mat-expansion-panel> <br>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Field-specific Search
+            </mat-panel-title>
+            <mat-panel-description>
+              Click here to search field-wise values
+            </mat-panel-description>
+          </mat-expansion-panel-header> 
+          <div class="row">
+            <div class="col-3">
+              <mat-form-field appearance="outline" style="width:100%">
+                <mat-label>Search {{selectedValue1}} </mat-label>
+                <mat-select name="fieldName" [(ngModel)]="selectedValue1" (selectionChange)="showFirstGroup()">
+                  <mat-option *ngFor="let selectedItem1 of selectItems1" [value]="selectedItem1.value">
+                    {{selectedItem1.name}}
+                  </mat-option>
+                 
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-3">
+             <mat-form-field appearance="outline" style="width:100%">
+               <mat-label>Search {{selectedValue1}} {{bName}}</mat-label>
+               <!-- <input matInput id="myInput2" (keyup)="applyFilter($event)" placeholder="Block Name"> -->
+               <!-- <mat-select name="fieldName" [(ngModel)]="selectedValue1" (selectionChange)="showFirstGroup()"> -->
+                <mat-select name="fieldName" [(ngModel)]="bName"  (selectionChange)="searchFirstGroup()">
+                <mat-option *ngFor="let first of firstGroup" [value]="first">
+                  {{first}}
+                </mat-option>
+               
+              </mat-select>
+             </mat-form-field> &nbsp;
+            </div>
+            <div class="col-3">
+              <mat-form-field appearance="outline" style="width:100%">
+                <mat-label>Search {{selectedValue}} under {{bName}} </mat-label>
+                <mat-select name="fieldName" [disabled]="!bName" [(ngModel)]="selectedValue" (selectionChange)="showSecondGroup()">
+                  <mat-option *ngFor="let selectedItem of selectItems" [value]="selectedItem.value">
+                    {{selectedItem.name}}
+                  </mat-option>
+                 
+                </mat-select>
+              </mat-form-field>
+            </div>
+          
+            <div class="col-3">
+             <mat-form-field appearance="outline" style="width:100%">
+               <mat-label>Search {{bName1}} for {{selectedValue}} </mat-label>
+               <!-- <input matInput id="myInput1" (keyup)="applyFilter1($event)" placeholder="Activity"> -->
+               <mat-select name="fieldName" [disabled]="!selectedValue" [(ngModel)]="bName1" (selectionChange)="searchSecondGroup()">
+                <mat-option *ngFor="let second of secondGroup" [value]="second">
+                  {{second}}
+                </mat-option>
+               
+              </mat-select>
+             </mat-form-field> &nbsp;
+            </div>
+            
+            
+           </div>
+           <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4"></div>
+            <div class="col-4 " style="text-align:right">
+              <button mat-raised-button (click)="resetList()" class="btn btn-primary mt-2" > Reset</button>
+        
+             </div>
+             
+           </div>
+        </mat-expansion-panel>
+        </mat-accordion> <br>
+  <div class="mat-elevation-z8" id="mattable">
+      <table mat-table [dataSource]="dataSource" class="mat-table-style" matSort>
+    <th mat-header-cell colspan="31" *matHeaderCellDef>
+      <div class="justify-content-center" style="text-align:center" >
+        <h4>{{ardbName}} ({{branchName}})</h4>
+        <h4>Run Date & Time : {{today}} </h4> <br>
+        <h4> <u> DCB as on  {{monthYear}}</u></h4>
+     </div>
+   </th>
+    <!-- Example of a normal text column -->
+    <ng-container matColumnDef="sl_no">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Sl No</th>
+      <td mat-cell *matCellDef="let row" style="min-width: 40px!important;">{{ row.sl_no }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="brn_cd">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Branch Name</th>
+      <td mat-cell *matCellDef="let row" style="min-width: 200px!important;">{{ row.brn_name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="agent_cd">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Agent Name</th>
+      <td mat-cell *matCellDef="let row" style="min-width: 200px!important;">{{ row.agent_name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="acc_type_cd">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Account Type</th>
+      <td mat-cell *matCellDef="let row" style="min-width: 200px!important;">{{ row.acc_type_desc }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="acc_num">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Account Number</th>
+      <td mat-cell *matCellDef="let row" class="center">{{ row.acc_num }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="cust_name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer Name</th>
+      <td mat-cell *matCellDef="let row" style="min-width: 310px!important;">{{ row.cust_name }}</td>
+    </ng-container>
+
+    <!-- Example of an amount column -->
+    <ng-container matColumnDef="sanc_amt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Sanction Amount</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.sanc_amt | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="total_disb_amt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Disbursement</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.total_disb_amt | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="first_disb_dt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>First Disbursement</th>
+      <td mat-cell *matCellDef="let row"  class="center">{{ row.first_disb_dt }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="last_disb_dt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Disbursement</th>
+      <td mat-cell *matCellDef="let row" class="center">{{ row.last_disb_dt }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="periodicity">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Periodicity</th>
+      <td mat-cell *matCellDef="let row" class="center">{{ getPeriodicity(row.periodicity) }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="instl_no">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Instl No</th>
+      <td mat-cell *matCellDef="let row" class="center" style="width: 2px !important;">{{ row.instl_no }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="instl_start_dt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Instl Start Date</th>
+      <td mat-cell *matCellDef="let row" class="center">{{ row.instl_start_dt }}</td>
+    </ng-container>
+
+    <!-- All numeric/amount fields formatted and aligned -->
+    <ng-container matColumnDef="prev_outstanding">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Previous Outstanding</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.prev_outstanding | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="ovd_demand">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Overdue Demand (Including Interest)</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.ovd_demand | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="curr_prn_demand">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Current Principal Demand</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.curr_prn_demand | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="curr_intt_demand">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Current Interest Demand</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.curr_intt_demand | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="total_demand">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Demand</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.total_demand | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <!-- Continue similarly for all numeric fields -->
+    <ng-container matColumnDef="additional_disb">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Additional Disbursement</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.additional_disb | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="ovd_recov">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Overdue Recovery</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.ovd_recov | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="curr_recov">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Current Recovery</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.curr_recov | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="adv_recov">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Advance Recovery</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.adv_recov | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="intt_recov">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Interest Recovery</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.intt_recov | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="total_recovery">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Recovery</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.total_recovery | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="outstanding">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Outstanding</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.outstanding | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="ovd_balance">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Overdue Balance</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.ovd_balance | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="default_days">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Default Days</th>
+      <td mat-cell *matCellDef="let row" class="center">{{ row.default_days }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="npa_status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>NPA Status</th>
+      <td mat-cell *matCellDef="let row" class="center">{{ row.npa_status }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="stock_security_outstanding">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Stock Security Outstanding</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.stock_security_outstanding | number:'1.2-2' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="collateral_security_outstanding">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Collateral Security Outstanding</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.collateral_security_outstanding | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="deposit_outstanding">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Deposit Outstanding</th>
+      <td mat-cell *matCellDef="let row" class="amount">{{ row.deposit_outstanding | number:'1.2-2' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="disclaimer0">
+  <td mat-footer-cell *matFooterCellDef colspan="6"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    Total
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer111">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTsanc_amt | number:'1.2-2'}}
+  </td>
+</ng-container>
+<ng-container matColumnDef="disclaimer112">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTtotal_disb_amt | number:'1.2-2'}}
+  </td>
+</ng-container>
+<ng-container matColumnDef="disclaimer1">
+  <td mat-footer-cell *matFooterCellDef colspan="6"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTprev_outstanding | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer2">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTovd_demand | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer3">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTcurr_prn_demand | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer4">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTcurr_intt_demand | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer5">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTtotal_demand | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer6">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTadditional_disb | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer7">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTovd_recov | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer8">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTcurr_recov | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer9">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTadv_recov | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer10">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTintt_recov | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer11">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTtotal_recovery | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer12">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOToutstanding | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer13">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTovd_balance | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer14">
+  <td mat-footer-cell *matFooterCellDef colspan="3"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTstock_security_outstanding | number:'1.2-2'}}
+  </td>
+</ng-container>
+<ng-container matColumnDef="disclaimer15">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTcollateral_security_outstanding | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+<ng-container matColumnDef="disclaimer16">
+  <td mat-footer-cell *matFooterCellDef colspan="1"
+    style="font-size: small; text-align: right; font-weight: 600;">
+    {{TOTdeposit_outstanding | number:'1.2-2'}}
+  </td>
+</ng-container>
+
+     <tr mat-footer-row *matFooterRowDef="['disclaimer0','disclaimer111','disclaimer112','disclaimer1','disclaimer2','disclaimer3',
+  'disclaimer4','disclaimer5','disclaimer6','disclaimer7','disclaimer8',
+  'disclaimer9','disclaimer10','disclaimer11','disclaimer12','disclaimer13',
+  'disclaimer14','disclaimer15','disclaimer16']"></tr>
+    <!-- Header Row -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <!-- Data Row -->
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <footer>
+  <small>
+    This report is generated through SynergicBanking
+   </small>
+  </footer>
+
+ 
+  </div>
+  <!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[20,5,10,15,25,50,100,resultLength]" MatPaginator></mat-paginator> -->
+  
+  
+  </div>
+  
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+  [printStyle]="{ '@page': { size: 'landscape !important' } }"
+   ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+  </div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

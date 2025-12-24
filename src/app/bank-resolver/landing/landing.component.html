@@ -1,0 +1,497 @@
+
+<!-- HTML Template -->
+<loading *ngIf="isLoading"></loading>
+
+<div class="dashboard-wrapper">
+  <!-- Premium Header Section -->
+  <div class="premium-header">
+    <div class="header-content">
+      <div class="marquee-container">
+        <marquee behavior="scroll" direction="left" scrollamount="8">
+          <h1 class="marquee-text">{{ marqueeText }}</h1>
+        </marquee>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Content -->
+  <div class="dashboard-content">
+     <div class="row mb-4" >
+      <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-blue">
+          <div class="stat-icon">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+          <div class="stat-details">
+            <h6>Today's Opening</h6>
+            <h3>{{ dashboardItem?.todaysOpening | number:'1.2-2' }}</h3>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-green">
+          <div class="stat-icon">
+            <mat-icon>arrow_downward</mat-icon>
+          </div>
+          <div class="stat-details">
+            <h6>Cash Received</h6>
+            <h3>{{ dashboardItem?.cashReceived | number:'1.2-2' }}</h3>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-orange">
+          <div class="stat-icon">
+            <mat-icon>arrow_upward</mat-icon>
+          </div>
+          <div class="stat-details">
+            <h6>Cash Paid</h6>
+            <h3>{{ dashboardItem?.cashPaid | number:'1.2-2' }}</h3>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-purple">
+          <div class="stat-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="stat-details">
+            <h6>Today's Closing</h6>
+            <h3>{{ dashboardItem?.todayClosing | number:'1.2-2' }}</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-3">
+         <div class="stat-card stat-card-total">
+            <div class="stat-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <h3 class="stat-value">{{totalUsers}}</h3>
+              <p class="stat-label">Total Users</p>
+            </div>
+          </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-active">
+              <div class="stat-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <h3 class="stat-value">{{activeUsers==0?1:activeUsers}}</h3>
+                <p class="stat-label">Active Users</p>
+              </div>
+            </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-inactive">
+              <div class="stat-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <h3 class="stat-value">{{inactiveUsers}}</h3>
+                <p class="stat-label">Inactive Users</p>
+              </div>
+            </div>
+      </div>
+      <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card stat-card-locked">
+              <div class="stat-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <h3 class="stat-value">{{lockedUsers}}</h3>
+                <p class="stat-label">Locked Users</p>
+              </div>
+            </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+       <div class="row" >
+      <div class="col-lg-8 col-md-12 mb-6">
+        <!-- Bar Chart -->
+        <div class="premium-card mb-6">
+          <div class="card-header-premium">
+            <div class="header-icon">
+              <mat-icon class="header-mat-icon">bar_chart</mat-icon>
+            </div>
+            <h5>Daily Financial Summary</h5>
+          </div>
+          <div class="card-body-premium">
+            <div class="chart-container" >
+              <ngx-charts-bar-vertical
+                [results]="chartData"
+                [scheme]="colorScheme2"
+                [xAxis]="true"
+                [yAxis]="true"
+                [legend]="true"
+                [showXAxisLabel]="true"
+                [showYAxisLabel]="true"
+                xAxisLabel="Category"
+                yAxisLabel="Amount (₹)"
+                [gradient]="true"
+                [animations]="true">
+              </ngx-charts-bar-vertical>
+              </div>
+          
+          </div>
+        </div>
+      </div>
+       <div class="col-lg-4 col-md-12 mb-6">
+        <div class="premium-card mb-6">
+          <div class="card-header-premium">
+            <div class="header-icon">
+              <mat-icon class="header-mat-icon">person</mat-icon>
+            </div>
+            <h5>User Type Distribution</h5>
+            <!-- <p class="chart-subtitle">Distribution by user roles</p> -->
+          </div>
+          <div class="card-body-premium">
+            <div class="chart-wrapper">
+              <ngx-charts-pie-chart
+                [view]="[400, 300]"
+                [results]="userTypeData"
+                [labels]="true"
+                [legend]="true"
+                [legendPosition]="'below'"
+                [doughnut]="true"
+                [arcWidth]="0.6"
+                [scheme]="userTypeColorScheme"
+                [gradient]="true"
+                (select)="onSelect($event)">
+              </ngx-charts-pie-chart>
+            </div>
+    
+          
+          </div>
+        </div>
+       </div>
+
+    </div>
+    <!-- *ngIf="sys.BranchCode=='101'" -->
+     <div class="row" *ngIf="sys.BranchCode=='101'">
+      <!-- Left Side - Charts -->
+      <div class="col-lg-8 col-md-12 mb-6">
+        <!-- Bar Chart -->
+        <div class="premium-card mb-6">
+          <div class="card-header-premium">
+            <div class="header-icon">
+              <mat-icon class="header-mat-icon">bar_chart</mat-icon>
+            </div>
+            <h5>All Branch Profit & Loss Position</h5>
+          </div>
+          <div class="card-body-premium">
+            <!-- <div class="filter-section" style="display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+                <label>Financial Year:</label>
+                <strong>{{ finYearLabel }}</strong>
+
+                <label style="margin-left:20px;">Select Month:</label>
+                <select [(ngModel)]="selectedMonth" (change)="updateDateRange()">
+                  <option value="FY">Full Year</option>
+                  <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">
+                    {{ getMonthName(m) }}
+                  </option>
+                </select>
+              </div> -->
+              <div class="filter-section" style="display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+              <label class="label-title">Financial Year:</label>
+              <span class="fy-label">{{ finYearLabel }}</span>
+
+              <label class="label-title" style="margin-left: 25px;">Select Month:</label>
+              <select class="month-select" [(ngModel)]="selectedMonth" (change)="updateDateRange()">
+                <option value="FY">Full Year</option>
+                <option *ngFor="let m of months" [value]="m.value" [disabled]="m.disabled">
+                  {{ m.label }}
+                </option>
+              </select>
+            </div>
+              <!-- <div class="chart-container" *ngIf="noDataView">
+                  <h3 style="text-align: center;">No Preview</h3>
+              </div> -->
+            <div class="chart-container" >
+              <ngx-charts-bar-horizontal
+                [view]="view"
+                [scheme]="colorScheme"
+                [customColors]="customColors"
+                [results]="single"
+                [gradient]="gradient"
+                [xAxis]="showXAxis"
+                [yAxis]="showYAxis"
+                [legend]="showLegend"
+                [showXAxisLabel]="showXAxisLabel"
+                [showYAxisLabel]="showYAxisLabel"
+                [xAxisLabel]="xAxisLabel"
+                [yAxisLabel]="yAxisLabel"
+                (select)="onSelect($event)"
+                (activate)="onActivate($event)"
+                (deactivate)="onDeactivate($event)">
+              </ngx-charts-bar-horizontal>
+
+
+
+              <!-- <ngx-charts-bar-vertical
+              [results]="single"
+              [scheme]="colorScheme"
+              [customColors]="customColors"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="true"
+              [showXAxisLabel]="true"
+              [showYAxisLabel]="true"
+              xAxisLabel="Branches"
+              yAxisLabel="Amount (₹)"
+              [gradient]="false"
+              [animations]="true">
+            </ngx-charts-bar-vertical> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-12 mb-6">
+        <!-- <div class="premium-card mb-4">
+          <div class="card-header-premium">
+            <div class="header-icon">
+              <mat-icon class="header-mat-icon">receipt_long</mat-icon>
+            </div>
+            <h5>Recent Transactions</h5>
+          </div>
+          <div class="card-body-premium list-body">
+            <div class="transaction-list">
+              <div class="transaction-item" *ngFor="let transaction of recentTransactions">
+                <div class="transaction-icon" [ngClass]="transaction.type">
+                  <mat-icon>{{transaction.icon}}</mat-icon>
+                </div>
+                <div class="transaction-details">
+                  <h6>{{transaction.title}}</h6>
+                  <span class="transaction-date">{{transaction.date}}</span>
+                </div>
+                <div class="transaction-amount" [ngClass]="transaction.type">
+                  {{transaction.amount | number:'1.2-2'}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> -->
+          <div class="premium-card mb-6">
+            <div class="card-header-premium">
+              <div class="header-icon">
+                <mat-icon class="header-mat-icon">trending_up</mat-icon>
+              </div>
+              <h5>Login Status Overview </h5>
+            </div>
+            <div class="filter-section" style="display:flex;margin: 30px; align-items:center; gap:15px; margin-bottom:12px;">
+              <label class="label-title">Active vs Inactive User</label>
+            </div>
+             <div class="chart-container" >
+              
+              <ngx-charts-bar-vertical
+                [view]="[400, 300]"
+                [results]="loginStatusData"
+                [xAxis]="true"
+                [yAxis]="true"
+                [legend]="false"
+                [showXAxisLabel]="true"
+                [showYAxisLabel]="true"
+                [xAxisLabel]="'Status'"
+                [yAxisLabel]="'Count'"
+                [scheme]="loginStatusColorScheme"
+                [gradient]="true"
+                [barPadding]="40"
+                (select)="onSelect($event)">
+              </ngx-charts-bar-vertical>
+            </div>
+          </div>
+       <!-- <div class="premium-card mb-6">
+            <div class="card-header-premium">
+              <div class="header-icon">
+                <mat-icon class="header-mat-icon">trending_up</mat-icon>
+              </div>
+              <h5>Top Performing Branches</h5>
+            </div>
+            <div class="card-body-premium list-body">
+              <div class="branch-list">
+                <div class="branch-item" *ngFor="let branch of topBranches; let i = index">
+                  <div class="branch-rank">
+                    <span class="rank-badge" [ngClass]="'rank-' + (i + 1)">{{i + 1}}</span>
+                  </div>
+                  <div class="branch-details">
+                    <h6>{{branch.name}}</h6>
+                    <div class="progress-bar">
+                      <div [ngClass]="branch.performance>0 ? 'progress-fill' : 'progress-fill2'"  [style.width.%]="branch.performance"></div>
+                    </div>
+                  </div>
+                  <div class="branch-percentage">
+                    {{branch.performance}}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> -->
+      </div>
+      <!-- <div class="col-lg-12 col-md-12 mb-3">
+      <div class="table-card">
+        <div class="table-header">
+          <h3 class="table-title">User Details</h3>
+          <div class="table-filters">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Search users..."
+              [(ngModel)]="searchText"
+              (input)="filterUsers()">
+            <select class="filter-select" [(ngModel)]="filterType" (change)="filterUsers()">
+              <option value="">All Types</option>
+              <option value="A">Admin</option>
+              <option value="S">Super Admin</option>
+              <option value="G">General</option>
+              <option value="X">Others</option>
+              <option value="D">Locked</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Full Name</th>
+                <th>User Type</th>
+                <th>Login Status</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of filteredUsers" [class.locked-row]="user.user_type === 'D'">
+                <td>
+                  <div class="user-id-cell">
+                    <span class="user-id-badge">{{user.user_id}}</span>
+                    <svg *ngIf="user.user_type === 'D'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lock-icon">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </div>
+                </td>
+                <td>
+                  <div class="user-name-cell">
+                    <div class="user-avatar">{{getInitials(user)}}</div>
+                    <span class="user-name">{{getFullName(user)}}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="type-badge" [ngClass]="getUserTypeClass(user.user_type)">
+                    {{getUserTypeLabel(user.user_type)}}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="user.login_status === 'Y' ? 'status-active' : 'status-inactive'">
+                    {{user.login_status === 'Y' ? 'Active' : 'Inactive'}}
+                  </span>
+                </td>
+                <td>
+                  <span class="account-status" [ngClass]="user.user_type === 'D' ? 'locked' : 'unlocked'">
+                    {{user.user_type === 'D' ? 'LOCKED' : 'Active'}}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="legend-card">
+        <h4 class="legend-title">User Type Legend</h4>
+        <div class="legend-grid">
+          <div class="legend-item">
+            <span class="legend-color" style="background: linear-gradient(135deg, #10b981, #059669);"></span>
+            <span class="legend-label"><strong>A</strong> - Administrator</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></span>
+            <span class="legend-label"><strong>S</strong> - Super Admin</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"></span>
+            <span class="legend-label"><strong>G</strong> - General User</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></span>
+            <span class="legend-label"><strong>X</strong> - Others</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: linear-gradient(135deg, #ef4444, #dc2626);"></span>
+            <span class="legend-label"><strong>D</strong> - Locked Account</span>
+          </div>
+        </div>
+      </div>
+      </div> -->
+     
+    </div>
+    <div>
+       <div class="col-lg-12 col-md-12 mb-3">
+          <!-- Quick Actions -->
+          <div class="premium-card">
+            <div class="card-header-premium">
+              <div class="header-icon">
+                <mat-icon class="header-mat-icon">flash_on</mat-icon>
+              </div>
+              <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body-premium list-body">
+              <div class="quick-actions-grid">
+                <button class="action-button" *ngFor="let action of quickActions" (click)="quickLink(action.label)" >
+                  <mat-icon>{{action.icon}}</mat-icon>
+                  <span>{{action.label}}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    
+    <!-- Charts Section -->
+    
+   
+
+  </div>
+</div>
+
+<!-- Success Modal -->
+<ng-template #template>
+  <div class="modal-body text-center premium-modal">
+    <div class="success-container">
+      <div class="success-box">
+        <div class="success-animation">
+          <div class="checkmark-circle">
+            <div class="checkmark"></div>
+          </div>
+        </div>
+        <h2 class="success-title">Success!</h2>
+        <p class="success-message">Hello {{currUser}}, everything is working perfectly.</p>
+        <button class="premium-button" (click)="closeL2L()">
+          <span>Continue</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

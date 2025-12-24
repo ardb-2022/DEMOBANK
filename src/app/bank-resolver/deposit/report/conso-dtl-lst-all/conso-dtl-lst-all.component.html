@@ -1,0 +1,168 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+      <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error! </strong> {{alertMsg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+      <form [formGroup]="reportcriteria">
+       <div class="form-row">
+           <div class="form-group col-12">
+            <small for="acc_type_cd">Account Type</small>
+            <select id="acc_type_cd" class="form-control form-control-sm" formControlName="acc_type_cd"
+              (change)="onAccountTypeChange()">
+            <option *ngIf="AcctTypes" disabled>Choose</option>
+                <option *ngFor="let acctType of AcctTypes" [value]="acctType.acc_type_cd">
+                  {{acctType.acc_type_cd +' ' + acctType.acc_type_desc}}
+                </option>
+            </select>
+          </div>
+          <div class="form-group col-12">
+            <label for="fromDate">As on</label>
+          <div class="input-group">
+            <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+            formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+            [isOpen]="isOpenFromDp">
+          <div class="input-group-append">
+            <button mat-raised-button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+          </div>
+          </div>
+      </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+        <button mat-raised-button class="btn btn-primary" (click)="SubmitReport()">Submit</button> &nbsp;
+        <button mat-raised-button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <div class="row d-flex justify-content-center align-items-center pt-4"
+  style="background-color: #78c2ad21; min-height: 20vh;">
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+    <div>
+     <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+     <button mat-raised-button type="button" 
+     class="btn btn-rounded btn-primary m-1" 
+     [useExistingCss]="true"
+     printSectionId="mattable" 
+    [printStyle]="{ '@page': { size: 'landscape !important' } }"
+     ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+    
+    </div>
+    </div>
+  <!-- {{ReportUrl}} -->
+  
+  <div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll"><br>
+<div class="filter-block">
+  <label>Branch: </label>
+  <select [(ngModel)]="selectedBranch" (change)="onBranchChange()">
+    <option value="ALL">ALL</option>
+    <option *ngFor="let b of branchMaster" [value]="b.brn_cd">{{ b.brn_name }}</option>
+  </select>
+</div>
+
+ <div id="mattable">
+      <div class="justify-content-center" style="text-align:center" >
+        <h4>{{ardbName}} ({{branchName}})</h4>
+        <h4>Run Date & Time : {{today}} </h4> <br>
+        <h4> <u> Consolidated Detail List as on  {{fromdate.toDateString()| date: 'dd/MM/yyyy'}}</u></h4>
+     </div>
+ <div  class="branch-block">
+  <h3 class="branch-title">Account Type: {{ selectedAccType}}</h3>
+  <table class="table-report">
+  <thead>
+    <tr>
+      <th *ngFor="let col of displayColumns"
+          [style.text-align]="isNumericColumn(col) ? 'right' : 'left'">
+        {{ col | uppercase }}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of tableData">
+      <td *ngFor="let col of displayColumns"
+          [style.text-align]="isNumericColumn(col) ? 'right' : 'left'">
+        <ng-container *ngIf="isNumericColumn(col); else textCell">
+          {{ row[col] | number:'1.2-2' }}
+        </ng-container>
+        <ng-template #textCell>
+          {{ row[col] }}
+        </ng-template>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td *ngFor="let col of displayColumns"
+          [style.text-align]="isNumericColumn(col) ? 'right' : 'left'">
+        <ng-container *ngIf="totals[col] !== undefined">
+          {{ totals[col] | number:'1.2-2' }}
+        </ng-container>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+  <br/>
+</div>
+
+<!-- GRAND TOTAL table (same columns so everything lines up) -->
+<!-- <div class="grand-total-block">
+  <table class="table-report">
+  
+    <tbody>
+      <tr class="grand-total-row total-row">
+       
+        <td *ngFor="let col of displayColumns"
+            [class.tot-col]="col === 'label'"
+            [ngClass]="{'numeric': isNumericColumn(col)}">
+          <ng-container *ngIf="col === 'label'">
+            {{ grandTotalRow.label }}
+          </ng-container>
+          <ng-container *ngIf="col !== 'label'">
+            <ng-container *ngIf="isNumericColumn(col)">{{ grandTotalRow[col] | number:'1.2-2' }}</ng-container>
+            <ng-container *ngIf="!isNumericColumn(col)">{{ '' }}</ng-container>
+          </ng-container>
+        </td>
+        
+      </tr>
+    </tbody>
+  </table>
+</div> -->
+
+</div>
+  <!-- <mat-paginator [length]="resultLength" showFirstLastButtons [pageSizeOptions]="[20,5,10,15,25,50,100,resultLength]" MatPaginator></mat-paginator> -->
+  
+  
+  </div>
+  
+  <div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+  <div>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+   <button mat-raised-button type="button" 
+   class="btn btn-rounded btn-primary m-1" 
+   [useExistingCss]="true"
+   printSectionId="mattable" 
+  [printStyle]="{ '@page': { size: 'landscape !important' } }"
+   ngxPrint>Print</button>
+   <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="downloadexcel()">Export as EXCEL</button>
+  
+  </div>
+  </div>
+  </div>
+  <loading *ngIf="isLoading"></loading>
+  

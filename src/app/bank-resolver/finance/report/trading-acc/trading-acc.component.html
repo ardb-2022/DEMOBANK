@@ -1,0 +1,83 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button"  class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div class="form-row">
+        <div class="form-group col-12">
+        <label for="fromDate">Transaction Date</label>
+        <div class="input-group">
+          <!-- <input id="fromDate" class="form-control" placeholder="yyyy-mm-dd" name="fd" [ngModel]="fromdate  | date:'yyyy-dd-MM' " formControlName="fromDate" id="fd" type="date" > -->
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+          formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+          </button>
+        </div>
+        </div>
+      </div>
+      
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer clearfix">
+      <button class="btn btn-primary" (click)="SubmitReport()">Submit</button>
+      <button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+
+<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-lg mb-4 bg-white p-3">
+  <table class="styled-table">
+  <thead>
+    <tr>
+      <th>Branch Code</th>
+      <th>Transaction Date</th>
+      <th>Transaction Code</th>
+      <th>Transaction Total</th>
+      <th>Denomination Total</th>
+      <th>Difference</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of reportData" [class.mismatch]="row.difference !== 0">
+      <td>{{ row.brn_cd }}</td>
+      <td>{{ row.trans_dt.substr(0,10) }}</td>
+      <td>{{ row.trans_cd }}</td>
+      <td class="amount">{{ row.trans_total | number: '1.2-2' }}</td>
+      <td class="amount">{{ row.denomination_total | number: '1.2-2' }}</td>
+      <td class="amount">{{ row.difference | number: '1.2-2' }}</td>
+      <td>
+        <span [ngClass]="row.difference !== 0 ? 'badge red' : 'badge green'">
+          {{ row.difference !== 0 ? 'MISMATCH' : 'MATCHED' }}
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+<div>
+<!-- <button type="button" class="btn btn-rounded btn-primary m-1"  (click)="exportPDFTitle()">Download PDF</button> -->
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+</div>
+</div>
+</div>
+<loading *ngIf="isLoading"></loading>

@@ -1,0 +1,111 @@
+/* table, th, td {
+    border: 1px solid;
+    
+  }
+table{
+    margin-left: 17%;
+}*/
+.mkScroll{
+  height:auto;
+  max-height:600px;
+  max-width:60%;
+  overflow:auto
+}
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.summary-table th,
+.summary-table td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+}
+
+.summary-table th {
+  background: #f4f4f4;
+  text-align: left;
+  font-weight: bold;
+}
+
+.summary-table td.amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-table td.desc {
+  min-width: 350px;
+}
+
+.summary-table tr.high-cd {
+  background-color: #e6f7ff; /* light blue */
+}
+
+.summary-table tr.low-cd {
+  background-color: #f6ffed; /* light green */
+}
+
+.summary-table td.highlight {
+  font-weight: bold;
+  /* color: #d4380d; */
+
+  background-color: #fff2e8;
+}
+.summary-table tr.total-row {
+  background-color: #fafafa;
+  font-weight: bold;
+  border-top: 2px solid #555;
+}
+.summary-table tr.deposit-total {
+  background-color: #729e72; /* green shade */
+  font-weight: bold;
+}
+.summary-table td.diff-col {
+  background-color: #f1db9e; /* green shade */
+  font-weight: bold;
+  color: brown;
+}
+
+.summary-table tr.loan-total {
+  background-color: #8598b4; /* blue shade */
+  font-weight: bold;
+}
+footer{
+  margin-left: 25px ; 
+  position:relative; 
+  bottom: 0px;
+}
+@media print{
+  @page {size: landscape}
+  footer{
+  margin-top: 25px !important; 
+  margin-left: 25px !important; 
+  position:fixed!important; 
+  bottom: 0px !important;
+} }
+
+/* @page 
+{
+ size:21cm 29.7cmt;
+ margin:2mm; 
+ mso-title-page:yes;
+ mso-page-orientation: portrait;
+ mso-header: header;
+ mso-footer: footer;
+}*/
+/* @page table{width:95%; margin: 10px;} */
+.mat-column-acc_cd{
+border-right: 1px solid rgb(172, 170, 170);
+padding-right: 5px;
+}
+
+.mat-column-activity{
+padding-left: 10px;
+/* border-right: 1px solid rgb(172, 170, 170);
+border-left: 1px solid rgb(172, 170, 170);
+border-top:1px solid rgb(172, 170, 170) ; */
+/* text-align: center; */
+}
+

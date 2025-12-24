@@ -1,0 +1,691 @@
+
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .company__info {
+    display: none !important;
+  }
+
+  .login_form {
+    border-radius: 20px;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+}
+.logo-animated {
+  width: 150px; /* or any suitable size */
+  height: 150px;
+  border-radius: 50%; /* fully rounded */
+  /* border: 4px solid #fff; */
+  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); */
+  /* animation: rotateLogo 4s linear infinite; */
+  /* transition: transform 0.3s ease; */
+  object-fit: cover;
+  
+}
+
+/* Animation keyframes */
+
+
+
+.fingerprint-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  max-width: 300px;
+  margin: auto;
+  transition: all 0.3s ease;
+}
+
+.finger-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #dcf54d;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.fingerprint-icon,
+.success-icon,
+.error-icon {
+  font-size: 60px;
+  transition: transform 0.3s ease;
+}
+
+.idle-icon {
+  color: #444;
+  opacity: 0.6;
+}
+
+.success-icon {
+  color: #28a745;
+  animation: pulse-green 0.6s ease-in-out forwards;
+}
+
+.error-icon {
+  color: #dc3545;
+  animation: pulse-red 0.6s ease-in-out forwards;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(0, 128, 0, 0.2);
+  border-top: 4px solid #28a745;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.btn-fingerprint {
+  background: linear-gradient(135deg, #0a6c26, #088d3e);
+  color: #ffffff;
+  border: none;
+  border-radius: 30px;
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 128, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-fingerprint:hover {
+  background: linear-gradient(135deg, #05531b, #066c2f);
+  box-shadow: 0 6px 15px rgba(0, 128, 0, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes pulse-green {
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Main Container */
+.premium-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Gradient */
+.bg-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #d1fae5 0%, #99f6e4 50%, #a5f3fc 100%);
+  z-index: 1;
+}
+
+/* Animated Background Circles */
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.bg-circle-1 {
+  top: 5rem;
+  left: 5rem;
+  width: 18rem;
+  height: 18rem;
+  background-color: rgba(167, 243, 208, 0.3);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.bg-circle-2 {
+  bottom: 5rem;
+  right: 5rem;
+  width: 24rem;
+  height: 24rem;
+  background-color: rgba(153, 246, 228, 0.2);
+  animation: pulse 3s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Login Container */
+.login-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.login-wrapper {
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  display: flex;
+  height: 650px;
+}
+
+/* Left Panel - Login Form */
+.login-panel {
+  width: 40%;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  position: relative;
+  /* overflow-y: auto; */
+}
+
+/* Logo Section */
+.logo-section {
+  margin-bottom: 2rem;
+}
+
+.logo-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.logo-icon {
+  width: 8rem;
+  background: linear-gradient(135deg, #f1f1f1 0%, #d0d1d1 100%);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.3);
+}
+
+.logo-img {
+  width: 8.5rem;
+  height: 8.5rem;
+  object-fit: contain;
+}
+
+.logo-text {
+  flex: 1;
+}
+
+.bank-name {
+  font-size: 2.4rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 10px;
+}
+
+.bank-subtitle {
+  font-size: 1.8rem;
+  color: #6b7280;
+  margin: 14px;
+}
+
+.welcome-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 1.5rem 0 0.5rem 0;
+}
+
+.bank-full-name {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Alert Box */
+.alert-box {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.alert-icon svg {
+  color: #dc2626;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #991b1b;
+  margin: 0 0 0.25rem 0;
+}
+
+.alert-message {
+  font-size: 0.75rem;
+  color: #b91c1c;
+  margin: 0;
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  color: #fca5a5;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.alert-close:hover {
+  color: #dc2626;
+}
+
+/* Form Styles */
+.login-form {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  background-color: white;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25rem;
+  padding-right: 3rem;
+  cursor: pointer;
+}
+
+.form-input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+/* Buttons */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+  color: white;
+  box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.4);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #90ffbc 0%, #67da63 100%);
+  box-shadow: 0 15px 30px -5px rgba(233, 250, 244, 0.76);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  padding: 0.75rem 1.5rem;
+  background-color: white;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+}
+
+.btn-secondary:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+/* Form Footer */
+.form-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.forgot-link {
+  font-size: 0.875rem;
+  color: #059669;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #047857;
+}
+
+/* Right Panel - Visual */
+.visual-panel {
+  width: 60%;
+  background: linear-gradient(135deg, #367556 0%, #2a7452 50%, #26ca68 100%);
+  /* background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #06b6d4 100%); */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Visual Background */
+.visual-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.visual-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.visual-circle-1 {
+  top: 0;
+  right: 0;
+  width: 24rem;
+  height: 24rem;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.visual-circle-2 {
+  bottom: 0;
+  left: 0;
+  width: 24rem;
+  height: 24rem;
+  background-color: rgba(45, 212, 191, 0.2);
+}
+
+/* Visual Content */
+.visual-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: white;
+  z-index: 10;
+}
+
+/* Illustration Card */
+.illustration-card {
+  width: 20rem;
+  height: 20rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 2rem;
+}
+
+.illustration-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Visual Text */
+.visual-text {
+  text-align: center;
+  max-width: 28rem;
+}
+
+.visual-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+}
+
+.visual-description {
+  font-size: 1.125rem;
+  opacity: 0.9;
+  margin: 0 0 2rem 0;
+}
+
+.visual-features {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.feature-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background-color: white;
+  border-radius: 50%;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .login-wrapper {
+    height: auto;
+    min-height: 600px;
+  }
+
+  .login-panel {
+    width: 45%;
+    padding: 2rem;
+  }
+
+  .visual-panel {
+    width: 55%;
+  }
+
+  .illustration-card {
+    width: 16rem;
+    height: 16rem;
+  }
+
+  .visual-title {
+    font-size: 1.875rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .login-panel {
+    width: 100%;
+    padding: 2rem;
+  }
+
+  .visual-panel {
+    width: 100%;
+    min-height: 400px;
+  }
+
+  .illustration-card {
+    width: 14rem;
+    height: 14rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .visual-title {
+    font-size: 1.5rem;
+  }
+
+  .visual-description {
+    font-size: 1rem;
+  }
+
+  .visual-features {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .premium-login {
+    padding: 0.5rem;
+  }
+
+  .login-panel {
+    padding: 1.5rem;
+  }
+
+  .logo-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .logo-img {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .bank-name {
+    font-size: 1.25rem;
+  }
+
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .btn-secondary {
+    width: 100%;
+  }
+
+  .illustration-card {
+    width: 12rem;
+    height: 12rem;
+  }
+}

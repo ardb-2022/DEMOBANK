@@ -1,0 +1,191 @@
+<ng-template #content let-modal data-keyboard="false" data-backdrop="false">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Report Criteria</h4>
+    <button type="button" class="close text-danger" aria-label="Close" data-dismiss="modal" (click)="modalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+      <div *ngIf="showAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>Error! </strong> {{alertMsg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="closeAlert()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+    <form [formGroup]="reportcriteria">
+      <div>
+        <label for="fromDate">As on</label>
+        <div class="input-group">
+          <input type="text" placeholder="dd/mm/yyyy" class="form-control" [ngModel]="fromdate" disabled bsDatepicker
+          formControlName="fromDate" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', containerClass:'theme-dark-blue' }"
+          [isOpen]="isOpenFromDp">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" (click)="isOpenFromDp = !isOpenFromDp">
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+          </button>
+        </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+      <button class="btn btn-primary" (click)="SubmitReport()">Submit</button>
+      <button class="btn btn-light" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>
+
+<div class="row d-flex justify-content-center align-items-center pt-4"
+style="background-color: #78c2ad21; min-height: 20vh;">
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+<div>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+  <button type="button" 
+  class="btn btn-rounded btn-primary m-1" 
+  [useExistingCss]="true"
+  printSectionId="hiddenTab" 
+  ngxPrint>Print</button>
+  <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+  <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1" (click)="exportToPDF()">Download PDF</button> -->
+
+ </div>
+</div>
+<div class="col-xs-12 col-sm-12 shadow-lg mb-4 bg-white p-3 mkScroll">
+ 
+<div class="report" id="hiddenTab">
+  <h2 class="center">PURI URBAN & RURAL DEVELOPMENT CO-OPERATIVE SOCIETY LTD.</h2>
+  <div class="sub-header">
+    <div>BRANCH : MAIN BRANCH | </div>
+    <div>BRANCH CODE : 101 | </div>
+    <div>RUN DATE : {{ today | date: 'dd/MM/yyyy' }}</div>
+  </div>
+  <h3 class="center">Scroll Book As On {{ fromdate | date:'dd/MM/yyyy' }}</h3>
+
+  <!-- <div class="section">
+    <h4>Account Type: CASH VOUCHER</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Trans Cd</th>
+          <th style="text-align: right;">Acc Num</th>
+          <th style="text-align: right;">Dep Amt</th>
+          <th>Withdrawal Amt</th>
+          <th>Trans Type</th>
+          <th style="text-align: left;">Customer Name</th>
+          <th *ngFor="let d of denominationKeys">{{ d }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of reportData">
+          <td>{{ row.trans_cd }}</td>
+          <td>{{ row.acc_num }}</td>
+          <td style="text-align: right;">{{ row.trans_type =='Deposit' ? row.trans_amt : 0 | number:'1.2-2'}}</td>
+          <td style="text-align: right;">{{ row.trans_type =='Withdrawl' ? row.trans_amt : 0 | number:'1.2-2'}}</td>
+          <td>{{ row.trans_type }}</td>
+          <td style="text-align: left;">{{ row.cust_name }}</td>
+          <td *ngFor="let d of denominationKeys">{{ row[d] || 0 }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div> -->
+<div class="section" *ngFor="let group of groupedData">
+  <h1>Account Type: {{ group.acc_type_desc }}</h1>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 50px;">Trans Cd</th>
+        <th style="text-align: left;width: 150px;">Acc Num</th>
+        <th style="text-align: right; width: 100px;">Deposit Amount</th>
+        <th style="text-align: right; width: 100px;">Withdrawal Amount</th>
+        <th style="width: 150px;">Trans Type</th>
+        <th style="text-align: left;">Customer Name</th>
+        <th *ngFor="let d of denominationKeys" class="denom-header">{{ d }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of group.transactions">
+        <td style="width: 50px;">{{ row.trans_cd }}</td>
+        <td style="width: 150px;">{{ row.acc_num }}</td>
+        <td [ngClass]="row.trans_type === 'Deposit' ? 'green' : ''" style="text-align: right;width: 100px;">
+          {{ row.trans_type == 'Deposit' ? row.trans_amt : 0 | number:'1.2-2' }}
+        </td>
+        <td [ngClass]="row.trans_type === 'Withdrawl' ? 'red' : ''" style="text-align: right;width: 100px;">
+          {{ row.trans_type == 'Withdrawl' ? row.trans_amt : 0 | number:'1.2-2' }}
+        </td>
+        <td style="width: 150px;">{{ row.trans_type }}</td>
+        <td style="text-align: left;">{{ row.cust_name }}</td>
+        <td *ngFor="let d of denominationKeys" [ngClass]="row[d] > 0 ? 'green' : row[d] < 0 ? 'red' : ''" class="denom-cell">
+          {{ row[d] || 0 }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+  <div class="summary">
+    <p><strong>Total Transaction:</strong> {{ reportData.length }}</p>
+    <p><strong>Opening Balance:</strong> {{ openingBalance | number:'1.2-2' }}</p>
+    <p><strong>Total Receipts:</strong> {{ totalDeposit | number:'1.2-2' }}</p>
+    <p><strong>Total Payments:</strong> {{ totalWithdrawal | number:'1.2-2' }}</p>
+    <p><strong>Closing Balance:</strong> {{ closingBalance | number:'1.2-2' }}</p>
+
+    <h1>Denomination Total</h1>
+    <table>
+      <thead>
+        <tr>
+          <th *ngFor="let d of denominationKeys">{{ d }}</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td *ngFor="let d of denominationKeys">{{ totalDenominations[d] }}</td>
+          <td>{{ totalDenominationValue | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+ <form [formGroup]="filterForm">
+   <div class="filter-box">
+  <div class="filter-group">
+    <h4>Set Filter Criteria On Deposit Amt</h4>
+    <input type="number" placeholder="From" formControlName="depositFrom">
+    <input type="number" placeholder="To" formControlName="depositTo">
+    <button (click)="applyFilter()">Filter</button>
+    <button (click)="resetFilter()">Remove Filter</button>
+  </div>
+
+  <div class="filter-group">
+    <h4>Set Filter Criteria On Withdrawal Amt</h4>
+    <input type="number" placeholder="From" formControlName="withdrawFrom">
+    <input type="number" placeholder="To" formControlName="withdrawTo">
+    <button (click)="applyFilter()">Filter</button>
+    <button (click)="resetFilter()">Remove Filter</button>
+  </div>
+
+  <div class="filter-group">
+    <h4>Search By Customer ID:</h4>
+    <input type="text" formControlName="custId">
+    <h4>Search By Account No:</h4>
+    <input type="text" formControlName="accNum">
+    <button (click)="applyFilter()">Search Data</button>
+    <button (click)="resetFilter()">Remove Filter</button>
+  </div>
+
+
+  </div>
+ </form>
+</div>
+<div  class="col-xs-12 col-sm-12 col-md-8 col-lg-8 shadow-sm mb-4 bg-white p-3">
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="closeScreen()" >Close</button>
+ <button type="button" 
+ class="btn btn-rounded btn-primary m-1" 
+ [useExistingCss]="true"
+ printSectionId="hiddenTab" 
+ ngxPrint>Print</button>
+ <button type="button" class="btn btn-rounded btn-primary m-1" (click)="onLoadScreen(content)">Retrieve</button>
+ <!-- <button mat-raised-button type="button" class="btn btn-rounded btn-primary m-1"  (click)="exportToPDF()">Download PDF</button> -->
+
+</div>
+</div>
+<loading *ngIf="isLoading"></loading>

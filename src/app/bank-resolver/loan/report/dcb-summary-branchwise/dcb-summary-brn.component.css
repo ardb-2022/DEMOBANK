@@ -1,0 +1,123 @@
+.mkScroll {
+    height: auto;
+    max-height: 550px;
+    overflow: auto
+  }
+  
+
+.table-report {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.table-report th,
+.table-report td {
+  border: 1px solid #cfcfcf;
+  padding: 6px 8px;
+  vertical-align: middle;
+  word-break: break-word;
+}
+
+.table-report th {
+  background: #f5f7fa;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.numeric {
+  text-align: right;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.agent-header-row td {
+  background: #eef3f8;
+  font-style: normal;
+  font-weight: 600;
+  color: #2b5a86;
+}
+
+.total-row {
+  font-weight: 700;
+}
+
+/* slightly different colors for agent/branch/grand rows */
+.agent-total-row {
+  background: #fff6e6;
+   color: #65801b;   /* pale yellow */
+}
+
+.branch-total-row {
+  background: #eaf7ff; 
+  font-size: 14px;
+  color: #774e37;  /* pale blue */
+}
+
+.grand-total-row {
+  background: #ffdfe0;   /* pale red/pink */
+  color: #4a2a2a;
+}
+
+/* make the leftmost label column stand out */
+.table-report td:first-child, .table-report th:first-child {
+  text-align: left;
+  width: 260px; /* value may be adjusted so totals text fits */
+}
+
+/* responsive — wrap if very narrow */
+@media (max-width: 900px) {
+  .table-report {
+    font-size: 11px;
+  }
+}
+.branch-title{
+   font-size: 16px;
+  font-weight: 700;
+  color: #385b88;
+}
+.table-report td.tot-col{
+  min-width: 215px;
+}
+/* Branch and Agent columns */
+.table-report td.brn-col,
+.table-report th.brn-col,
+.table-report td.agent-col,
+.table-report td.dds_acc_num-col
+.table-report th.agent-col {
+  min-width: 100px ;
+}
+
+
+/* Numeric (amount) columns */
+.table-report td.numeric,
+.table-report th.numeric {
+  text-align: right;
+  white-space: nowrap;
+  width: 170px;   /* adjust as needed */
+}
+.total-row {
+  font-weight: bold;
+  background-color: #f8f6ef;
+}
+.total-label {
+  text-align: left;
+  font-weight: bold;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+
+}
+
+
+  @media print{footer{
+    margin-top: 25px !important; 
+    margin-left: 25px !important; 
+    position:fixed!important; 
+    bottom: 0px !important;
+  } }
