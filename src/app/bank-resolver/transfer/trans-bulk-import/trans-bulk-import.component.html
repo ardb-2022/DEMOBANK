@@ -88,7 +88,7 @@ style="background-color: #78c2ad21; min-height: 90vh;">
             <td class="text-end">{{ row.amount | number:'1.2-2' }}</td>
             <td>{{ row.acc_cd }}</td>
             <td>{{ row.narration }}</td>
-            <td>{{ row.trans_dt ? (row.trans_dt | date:'dd/MM/yyyy') : '' }}</td>
+            <td>{{ row.trans_dt ? (row.trans_dt.substr(0,10)) : '' }}</td>
             <td [ngClass]="row.acc_num_flag === 'Y' ? 'green' : 'red'">{{ checkFlag(row.acc_num_flag) }}</td>
             <td [ngClass]="row.balance_flag === 'Y' ? 'green' : 'red'" >{{ checkFlag(row.balance_flag)}}</td>
             <td [ngClass]="row.gl_flag === 'Y' ? 'green' : 'red'">{{ checkFlag(row.gl_flag)}}</td>

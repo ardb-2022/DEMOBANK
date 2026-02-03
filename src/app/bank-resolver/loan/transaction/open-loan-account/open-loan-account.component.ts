@@ -78,6 +78,12 @@ export class OpenLoanAccountComponent implements OnInit {
   newtm_deposit:any;
   SecaccNum:any;
   SecaccCD:any;
+  totalGold=0;
+  totalLand=0;
+  totalDeposit=0;
+  totalLic=0;
+  totalGovCert=0;
+  totalStock=0;
   shownoresult:Boolean
   // selectedType = 'G'; 
   acc_data:any[]=[];
@@ -419,6 +425,7 @@ export class OpenLoanAccountComponent implements OnInit {
     });
   }
   resetSlNo(): void {
+  
   this.securities.controls.forEach((group, index) => {
     group.get('sl_no')?.setValue(index + 1);
     });
@@ -2181,6 +2188,41 @@ getHousingOrNot(i:any): boolean {
       dt.setDate(0);
   
       this.masterModel.tmlaonsanctiondtls[idx].due_dt = dt;
+    }
+    if( this.tm_loan_sanction_dtls[0]?.sanc_amt>0){
+  // Initialize totals
+      this.totalGold = 0;
+      this.totalLand = 0;
+      this.totalDeposit = 0;
+      this.totalLic = 0;
+      this.totalGovCert = 0;
+      this.totalStock = 0;
+
+      // Calculate totals from all rows
+      this.securities.controls.forEach((group: AbstractControl) => {
+        const gold = +(group.get('gold_val')?.value || 0);
+        const deposit = +(group.get('prn_amt')?.value || 0);
+        const land = +(group.get('Market Value')?.value || 0);
+        const lic = +(group.get('pol_sur_val')?.value || 0);
+        const govCert = +(group.get('sum_assured')?.value || 0);
+        const stock = +(group.get('stock_value')?.value || 0);
+        
+        // Accumulate totals
+        this.totalGold += gold;
+        this.totalLand += land;
+        this.totalDeposit += deposit;
+        this.totalLic += lic;
+        this.totalGovCert += govCert;
+        this.totalStock += stock;
+      });
+      console.log(this.totalGold,this.totalLand,this.totalDeposit,this.totalLic,this.totalGovCert,this.totalStock)
+      console.log(this.tm_loan_sanction_dtls[0]?.sanc_amt)
+      console.log(this.totalGold+this.totalLand+this.totalDeposit+this.totalLic+this.totalGovCert+this.totalStock)
+      if(this.tm_loan_sanction_dtls[0]?.sanc_amt > this.totalGold+this.totalLand+this.totalDeposit+this.totalLic+this.totalGovCert+this.totalStock)
+      { 
+        this.HandleMessage(true, MessageType.Warning, 'Sanction amount must be lower than combined securities value.');
+        this.tm_loan_sanction_dtls[0].sanc_amt=0;
+      }
     }
     
   }

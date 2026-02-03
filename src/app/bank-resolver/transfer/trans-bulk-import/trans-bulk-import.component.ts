@@ -121,6 +121,13 @@ checkFlag(flag: string): string {
 
     reader.readAsBinaryString(file);
   }
+  parseDate(dateStr: string): Date | null {
+  const parts = dateStr.split(' ')[0].split('/'); // "30/10/2025" -> ['30','10','2025']
+  if (parts.length === 3) {
+    return new Date(+parts[2], +parts[1] - 1, +parts[0]); // year, month-1, day
+  }
+  return null;
+}
   clear(){
   this.jsonDataView = [];
   this.jsonData = [];

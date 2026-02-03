@@ -33,9 +33,10 @@ declare const GetTemplate: (tmpFormat: string) => any;
 export class LoginComponent implements OnInit ,AfterViewInit{
 
   // private apiUrl = 'https://api.ipify.org/?format=json';
-  private apiUrl = 'https://api.ipify.org?format=json';
   // https://api64.ipify.org/?format=json
   // https://api4.ipify.org/?format=json
+
+  private apiUrl = 'https://api.ipify.org?format=json';
   private baseURL:string='https://demobanking.synergicapi.in/DEMOUX/api'
   loginForm: FormGroup;
   returnUrl: string;
@@ -771,22 +772,22 @@ debugger
           // localStorage.setItem('ipAddress',myIP[0])
           this.isLoading = false;
 
-          // this.loginForm.enable();
-          // resolve(true);
+          this.loginForm.enable();
+          resolve(true);
 
-          let ipMatched = false;
-          if (e.ip_address.indexOf(myIP[0]) !== -1) {
-             ipMatched = true;
-            }
+          // let ipMatched = false;
+          // if (e.ip_address.indexOf(myIP[0]) !== -1) {
+          //    ipMatched = true;
+          //   }
 
-          if (!ipMatched) {
-           this.HandleMessage(true, MessageType.Error, `IP not allowed to access, contact support`);
-            this.loginForm.disable();
-            resolve(false);
-          } else {
-            this.loginForm.enable();
-            resolve(true);
-          }
+          // if (!ipMatched) {
+          //  this.HandleMessage(true, MessageType.Error, `IP not allowed to access, contact support`);
+          //   this.loginForm.disable();
+          //   resolve(false);
+          // } else {
+          //   this.loginForm.enable();
+          //   resolve(true);
+          // }
           });
         
      }
