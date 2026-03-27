@@ -21,6 +21,7 @@ import { AccordionModule } from 'ngx-bootstrap/accordion';
 import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { DatePipe } from '@angular/common';
+import { EncryptionInterceptor } from './_service/EncryptionInterceptor';
 // import { EncryptionInterceptor } from './_service/EncryptionInterceptor';
 @NgModule({
   declarations: [
@@ -44,11 +45,11 @@ import { DatePipe } from '@angular/common';
     ModalModule.forRoot(), BsDatepickerModule.forRoot(), AccordionModule.forRoot()
   ],
   providers: [DatePipe,
-  //   {
-  //   provide: HTTP_INTERCEPTORS,
-  //   useClass: EncryptionInterceptor,
-  //   multi: true
-  // }
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: EncryptionInterceptor,
+    multi: true
+  }
   ],
   bootstrap: [AppComponent]
 })

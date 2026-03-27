@@ -630,7 +630,9 @@ getparamval(){
         console.log(RestService.bankconfigurationList)
         this.ardbBrnMst = data;
       }
-
+ const encryptedResponse = "U2FsdGVkX1+SryKzb6upemmZs05SKKuqR0w5TtPTGc37EUWvsc2/C+30F2eoV++YEpdqpmKaYzjbNrlRdifbnSvCtxSuuynrEcL3iOPUHoeo85OwzG+gbXrz2YwpbL8gkEM88MiVBfwp4NPBreybkiGp72RHe02bMZspTk1B6OL9/E3JKWM7v1Ip8e7ZgrI4GcTTy60Y1ejEgjSR9ZciatXmRjY5Hy7DWnc2RU1ZNYgr+hNvkYUz1aaHPSQslUE1NeTc89GxRioh3O9+yFx3RV+wqsaw+In0xLla7ZJdEzm/TWwmBZYYZN+m255dQfrmaVTx/6pl5LTsR6EeKnnVVH9GRWFpRvRCNMPVSfph3yzrRox6yMSwhVJhBIhaYnnZEts2RftMDKbUZKIG5TgNriy8jtxSdLqswLValkp8rUdCn++eE44py/Ct74BhoL/5OYVJe3rvN5F8hoFGgcd0HqBmDLFo2Ur61ex8xXTBLSsipaYIhk9geecFWW0F2jRahkcARjMQJMwPnq7a2fyUlfxhfPU57+UxzykA88In/LNJ3OSuTV87D0Po0Qp64zaLRRcZoRIEK/HR3O9LCTsfGHBM9Zta13IktDG52sHGO52LvUBcNNz3cX99XN0msgIV65KyxL8W6kFbD2QVBmhQBs6LbeU5UdSI4J4NscWtJ0/TphpB1fYG+4nzJ+TVGnT+v9L+6w7Lrz9gXce/Oe8eJgxfE+CNLTLOCYZAZvEdFlwWEhplzS/pytiXnvK4v+eWCKII+KBV1pbE/RCCAtLpP8P92aZBbbI1o9TLRfVkTRk8TOFKcJaBQVkXmfHiUWlsBBBqxDj7AYjXETZFofNIP3siXIWaDln5HpIpj8GxPpWr3NYykG9ElKZxtjgrh8NDFljqGDpeIkTiAcor0UWYaFgpyet3tsc8yKa3QapSffyOskg0Q6y/3wBbmk5SQ3E+APfrBkdaktvyG+KtnO8wJ5ywoId4ube7tu3b7CYMg5oudWzwOVHzSBHdn+2dzZ3J13tO5r7GDiYrrsvBmyUSvMGvzzX1uxpdBg9vfcFRjXY1T15e1rbsYlB4tDFiplPOmvU/r5RiMpjFqud6Mf3/2nu8gBUTM4BgXWmnBNUXdf2Xuif6YZ/LssB0xtGI+PthwJ1QlS7jiK1HClnC+LFljf8eZrVFOBZMNODad5JNfTDLoh1i9ruiP0qf4Y4puYA7hItiy8Jkhl/nUhj5W1puBAYJoNMGbNMzWp58xWZkC/qCsYhd5STHHOIIvYcHwD8yu+I3Y21YZYo2NjpKdxNW10BzCGLryDVwt7N3ol15rzDw3+8Hucd3IUVWFpr8gL+/P/vs3Hr4HMUGpZOJ7H5R7J97iquJtbDOeXY7zeL+pwa44N0QHZZK+xO9KEh2rwaqiy5rpu1kwJ/dZuDliakz5CFaFh4bPabvjTatKVUU34ImcwHDa1aSCNyu44olvgLRQmt86ewkCNDuIZDOCUNa4wKj6jzg3fSXrUKVvzF4iwahvAfrgHIKpA+hcYWX4y5n9OyzC+EMDFGDv6zIsKEI44/+TqlK83/l8s2qVZ1Rg/C4rgAF8tmGHBEikoQV9g8mA1v8gPUrpFXRWRon0Q6p1sYGubmVSzC1DLrRmcaLuq6oy+JrmDq/9N0gsv3ywnnih6l2l7pRpx08KltSYuByAAQi0Fss2xYnY4oADg8Opk6HSiYsY8vz8JQ7SMwg89YDJMG6/UFvYiBewmVAUC4WD2tgFSoYpLvTHdAL1Dx8IuJl8pFnqnwbaUL6gixoVNsRuYMicGit7abwL5ZJkz2tHGt2hYxV4i6R3VhXpoO6oP1Hklf5CACZe1mcZ9Vwgits";
+        const decrypted = this.Encrypt.decryptToObject(encryptedResponse);
+        console.log("Decrypted result:", decrypted);
       // this.menuConfigs=data;
     })
   }
@@ -670,11 +672,7 @@ debugger
        this.userData[0]?.user_type != 'A' ? this.f.branch.disable() : this.f.branch.enable();
         this.HandleMessage(this.userData[0]?.login_status == 'Y', MessageType.Error, `User id already logged in another machine`);
       }else{
-        // U2FsdGVkX1//yt5vnAUyYgWlmCsZOFVN0WbyC/HEypA=
-        //U2FsdGVkX1/5PQsbCvkBEHcZLIjX8Q9RLHZJHxeHjUAXAHIK7yn7Y3oGdRZp/D8iNNTeA0DwohiNhf3d0kRkKFPcp3ZfL1UWUHwJhK5Vrx0Tz5bn7Sc2QZoSkmC7GiJTLSxMI8oZlFOu+PvtnzLR4w==
-        // const encryptedResponse = "";
-        // const decrypted = this.Encrypt.decryptToObject(encryptedResponse);
-        // console.log("Decrypted result:", decrypted);
+       
         this.isLoading=false;
       }
        // if (this.userData[0].user_type != 'A') {
